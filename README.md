@@ -3,6 +3,11 @@ Group Project by Parvathy Mohan and Saranya Balaji for Python course
 
 1. Step 1: Html Parsing:
 a) BeautifulSoap4
+Library: BeautifulSoap4
+Reference : http://www.pythonforbeginners.com/python-on-the-web/web-scraping-with-beautifulsoup/
+commands:
+pip install beautifulsoup4 
+
 
 b) Content Extraction: 
 Library name - NewsPaper
@@ -15,6 +20,9 @@ Library: Spacy
 Commands:
 python -m pip install -U spacy
 python -m spacy download en
+
+
+
 
 
 
