@@ -1,39 +1,39 @@
 import spacy
 import wikipedia
-from crawler import content_extraction
 
-website_url = "https://www.yahoo.com/news/sister-york-attack-suspect-says-may-brainwashed-appeals-162102000.html"#"http://news.bbc.co.uk/2/hi/health/2284783.stm"
-
-def get_nouns():
-    """Get all noun chunks from the text extracted from website"""
-    nlp = spacy.load('en')
-    handle = content_extraction.get_text(website_url);#htmlParser(website_url);
-    sentence = "";
-    for line in handle:
-        sentence += line
-    doc = nlp(sentence)
-    noun_chunks = []
-    for word in doc:
-        print(word.text, word.lemma, word.lemma_, word.tag, word.tag_, word.pos, word.pos_)
-    print(doc.noun_chunks)
-    for noun_word in doc.noun_chunks:
-        #no need for pronouns like he,him,her etc
-        if noun_word.lemma_ == '-PRON-':
-            continue;
-        #print(noun_word.text);
-        noun_chunks.append(noun_word.text);
-            
-    noun_chunks_extension = [];
-    for noun in noun_chunks:
-        print("For noun : ", noun)
-        related_topics = wikipedia.search(noun, results=3);
-        #print("Noun : ", noun);
-        for topic in related_topics:
-            if topic in sentence:
-                #print("Topic >> ", topic);
-                noun_chunks_extension.append(topic);
-    return set(noun_chunks+noun_chunks_extension);
-
-for val in get_nouns():
-    print(val)
-            
+#TODO:
+#1. More fine tuning of candidates
+#2. Change the spacy default loading to vector loading     
+#3. How to remove similar candidates like "Donald" and "Donald Trump"       
+def get_nouns(content):
+    """Get all noun chunks from the text extracted from website
+    and get related values from wiki"""
+    nlp = spacy.load('en');#,vectors='en_google')
+    doc = nlp(content)
+    noun_candidates = []
+    for token in doc:
+        print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_,
+          token.shape_, token.is_alpha, token.is_stop, token.ent_type_)
+        #heuristics : Fine tuning candidates
+        if (token.pos_ == 'PROPN' and len(token.text) > 2) or \
+        (token.pos_ == 'NOUN' and token.tag_ != 'WP' and len(token.text) > 3):
+            if(token.ent_type_ != 'DATE'):
+                #short nouns does not make sense, we can remove them.
+                #Date words like November does not make sense
+                noun_candidates.append(token.text.lower());
+    #once we get noun candidates (individual words), we search wiki articles to 
+    #see if there is any relates word phrase results that is also 
+    #present in our web-content
+    wiki_results = [];
+    for noun in noun_candidates:
+        print("Noun Candidate : ", noun)
+        wiki_result = wikipedia.search(noun, results=20);
+        #print("Wiki : ", wiki_result);
+        for topic in wiki_result:
+            #TODO: Look for a combination of words in topic
+            if len(topic.split()) > 0 and len(topic) > 3 and (topic.lower() in content.lower()):
+                if topic.lower() == noun.lower():
+                    continue;
+                print("Wiki Candidate >> ", topic);
+                wiki_results.append(topic.lower());
+    return set(noun_candidates+wiki_result);
