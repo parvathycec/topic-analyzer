@@ -16,10 +16,12 @@ Command:
 python -m pip install newspaper3k
 
 2. Noun Chunker:
-Library: Spacy
+Library: Spacy, Wikipedia
 Commands:
 python -m pip install -U spacy
 python -m spacy download en
+python -m pip install wikipedia
+
 
 
 
