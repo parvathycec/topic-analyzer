@@ -1,1 +1,1 @@
-model_path = 'data.model/GoogleNews-vectors-negative300.bin'
+model_path = 'C:/Users/parvathy/Documents/UNH/Fall 2017/Python/Project/data.model/GoogleNews-vectors-negative300.bin'
