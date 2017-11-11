@@ -36,4 +36,4 @@ def get_nouns(content):
                     continue;
                 print("Wiki Candidate >> ", topic);
                 wiki_results.append(topic.lower());
-    return set(noun_candidates+wiki_result);
+    return set(noun_candidates+wiki_results);
