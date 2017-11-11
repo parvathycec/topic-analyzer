@@ -1,0 +1,1 @@
+model_path = 'data.model/GoogleNews-vectors-negative300.bin'
