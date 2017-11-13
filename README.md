@@ -31,6 +31,11 @@ Data Set: GoogleNews Pre-trained data set. Download from here:
 https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit
 Once you download it, give the path in the __init__.py of grouping package.
 
+4. Ranking:
+Library: requests, beautifulsoup4
+commands: pip install beautifulsoup4
+pip install requests
+reference : http://www.pythonforbeginners.com/beautifulsoup/beautifulsoup-4-python
 
 
 
