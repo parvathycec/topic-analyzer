@@ -2,8 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 import RankedWord  #import the class file
 
-url = 'https://en.wikipedia.org/wiki/Python_(programming_language)'
-
+#url = 'https://en.wikipedia.org/wiki/Python_(programming_language)'
+url = "https://stackoverflow.com/questions/23238352/create-object-from-class-in-separate-file"
+url1 = "https://stackoverflow.com/questions/33176278/beautifulsoup-find-all-occurrences-of-specific-text"
 def check_all_cases_rank(key,content,total_rank):
 
     #this function checks for the key in the respective content across all the cases and assigns the rank
@@ -60,18 +61,20 @@ def do_rank(url,word):
 
     each_word = text.split(" ")
     
+    #print(each_word)
     
     #calculate the occurences of the word in the entire webpage
     
     no_of_occurences_lower_case = each_word.count(word.lower())
+    print(no_of_occurences_lower_case)
     no_of_occurences_upper_case = each_word.count(word.upper())
     no_of_occurences_title_case = each_word.count(word.title())
-     
+    print(no_of_occurences_title_case)
     #check for mixed cases
-    if word.isupper ==  False:
-        if word.islower == False:
-            if word.istitle == False:
-                no_of_occurences_mixed_case = text.count(word)
+    if word.isupper() ==  False:
+        if word.islower() == False:
+            if word.istitle() == False:
+                no_of_occurences_mixed_case = each_word.count(word)
 
     
     
@@ -93,14 +96,14 @@ def do_rank(url,word):
 
     #total rank
     total_rank = title_rank + meta_rank + url_rank + occurences_rank + h1_tag_rank
-    
+    print(occurences_rank)
     
     rank_obj.score = total_rank
 
     return rank_obj
 
 
-r = do_rank(url,"wiki")
+r = do_rank(url1,"python")
 
 print(r.getword())
 print(r.getscore())
