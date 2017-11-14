@@ -71,13 +71,17 @@ def do_rank(url,word):
     meta_rank = check_all_cases_rank(word,meta_content,5)
 
     #get the total text
-    text = soup.get_text()
+    text = soup.text
+
+    each_word = text.split(" ")
+    
     
     #calculate the occurences of the word in the entire webpage
-    no_of_occurences_lower_case = text.count(word.lower())
-    no_of_occurences_upper_case = text.count(word.upper())
-    no_of_occurences_title_case = text.count(word.title())
-
+    
+    no_of_occurences_lower_case = each_word.count(word.lower())
+    no_of_occurences_upper_case = each_word.count(word.upper())
+    no_of_occurences_title_case = each_word.count(word.title())
+     
     #check for all the cases
     if word.isupper ==  False:
         if word.islower == False:
