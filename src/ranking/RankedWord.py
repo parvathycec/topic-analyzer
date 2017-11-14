@@ -1,7 +1,8 @@
 class RankedWord:
-    def __init__(self,word,score):
+    def __init__(self,word,isPos,score=0):
         self.score = score
         self.word = word
+        self.isPos = isPos
 
     def getscore(self):
         return self.score

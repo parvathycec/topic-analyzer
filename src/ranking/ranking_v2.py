@@ -5,6 +5,8 @@ import RankedWord  #import the class file
 #url = 'https://en.wikipedia.org/wiki/Python_(programming_language)'
 url = "https://stackoverflow.com/questions/23238352/create-object-from-class-in-separate-file"
 url1 = "https://stackoverflow.com/questions/33176278/beautifulsoup-find-all-occurrences-of-specific-text"
+url2 = "https://www.nytimes.com/2017/11/14/us/politics/jeff-sessions-congress-russia.html"
+
 def check_all_cases_rank(key,content,total_rank):
 
     #this function checks for the key in the respective content across all the cases and assigns the rank
@@ -23,7 +25,9 @@ def check_all_cases_rank(key,content,total_rank):
 
 def do_rank(url,word):
     score = 0
-    rank_obj = RankedWord.RankedWord(word,score)
+    rank_obj = RankedWord.RankedWord(word,isPos,score)
+
+    
     
     req= requests.get(url)  #get the url request
     soup = BeautifulSoup(req.text,"lxml") #parse it through BeautifulSoup
@@ -52,6 +56,8 @@ def do_rank(url,word):
        meta_con =  meta_tag.get("content",None)
        if meta_con != None:
            meta_content += meta_con + " "
+
+    print(meta_content)
            
     #check whether the word occurs in the meta data and assign rank
     meta_rank = check_all_cases_rank(word,meta_content,5)
@@ -85,17 +91,26 @@ def do_rank(url,word):
 
     #check whether the word appears in the url and assign rank accordingly
     url_rank = check_all_cases_rank(word,url,5)
+    print(url_rank)
     
     #find the h1 content of the webpage
-
+    h1_tag_content = None
     for h1_tag in soup.find_all("h1"):
         h1_tag_content = h1_tag.string
+        
+    print(h1_tag_content)
+    
 
     #if the word appears in the h1, then assign rank accordingly
-    h1_tag_rank = check_all_cases_rank(word,h1_tag_content,10)
-
+    if h1_tag_content != None:
+        h1_tag_rank = check_all_cases_rank(word,h1_tag_content,10)
+        
+    pos_score = 0
+    if rank_obj.isPos == "True":
+        pos_score = 50
+        
     #total rank
-    total_rank = title_rank + meta_rank + url_rank + occurences_rank + h1_tag_rank
+    total_rank = title_rank + meta_rank + url_rank + occurences_rank + h1_tag_rank + pos_score
     print(occurences_rank)
     
     rank_obj.score = total_rank
@@ -103,7 +118,7 @@ def do_rank(url,word):
     return rank_obj
 
 
-r = do_rank(url1,"python")
+r = do_rank(url2,"jeff")
 
 print(r.getword())
 print(r.getscore())
