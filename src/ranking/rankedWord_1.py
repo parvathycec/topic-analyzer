@@ -70,7 +70,7 @@ def do_rank(url,word):
     #check whether the word occurs in the meta data and assign rank
     meta_rank = check_all_cases_rank(word,meta_content,5)
 
-    #get the total text
+    #get the total text and avoid the tags
     text = soup.text
 
     each_word = text.split(" ")
@@ -82,11 +82,11 @@ def do_rank(url,word):
     no_of_occurences_upper_case = each_word.count(word.upper())
     no_of_occurences_title_case = each_word.count(word.title())
      
-    #check for all the cases
+    #check for mixed cases
     if word.isupper ==  False:
         if word.islower == False:
             if word.istitle == False:
-                no_of_occurences_mixed_case = text.count(word())
+                no_of_occurences_mixed_case = text.count(word)
 
     
     
