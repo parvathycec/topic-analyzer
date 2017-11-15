@@ -2,6 +2,7 @@ from crawler import content_extraction
 from chunker import noun_extractor
 from grouping import k_means
 import operator
+from ranking import ranking_v2, RankedWord
 
 class WebTopicAnalyzer:
     """Analyzer to analyze the topics related to a web page"""
@@ -14,19 +15,24 @@ class WebTopicAnalyzer:
         print(content);
         #step 2: get NOUN word or phrases
         nouns = noun_extractor.get_nouns(content);
-        #step 3: grouping of similar phrases and  eliminating repetition
-        clusters = k_means.get_clusters(nouns);
-        print(clusters)
-        #step 4: ranking
-        #ranked_words = [];
-        #for word_phrase in clusters:
-        #    ranked_word = RankedWord.RankedWord(word_phrase);
-        #    tester.count_of_occurence(ranked_word, content);
-        #    ranked_words.append(ranked_word);
-        #ranked_words.sort(key=operator.attrgetter('score'), reverse=True)
-        #print("------------TOP 5--------------")
-        #for ranked_word in ranked_words:
-        #    print(ranked_word.word_phrase.upper());
+        #step 3: ranking
+        ranked_words = [];
+        for w in nouns:
+            ranked_word = ranking_v2.do_rank(self.url, w);
+            ranked_words.append(ranked_word);
+        #step 4: grouping of similar phrases and  eliminating repetition
+        words, clusters = k_means.get_clusters(ranked_words);
+        print("CLUSTERS >> ", clusters)
+        final_ranked_words = [];
+        final_ranked_words.extend(words)
+        for data_cluster in clusters:
+            data_cluster.sort(key=operator.attrgetter('score'), reverse=True)
+            #Taking the most ranked word of the cluster
+            final_ranked_words.append(data_cluster[0]);
+        print("------------TOP 5--------------")
+        final_ranked_words.sort(key=operator.attrgetter('score'), reverse=True)
+        for rw in final_ranked_words:
+            print(rw.getword().upper(), " ", rw.getscore());
         
         
 

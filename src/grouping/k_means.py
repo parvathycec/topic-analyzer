@@ -72,28 +72,26 @@ def get_centroid(centroid_list, X):
     return get_centroid(centroid_list, X);
         
         
-def get_clusters(nouns):
+def get_clusters(ranked_words):
 
-    #need array of sentences (array of array of words)
-    noun_arr = list(nouns);
     model = models.KeyedVectors.load_word2vec_format(os.path.join(os.path.dirname(__file__), model_path), binary=True, limit=50000)
     model.init_sims(replace=True)
     model.save('GoogleNews-vectors-gensim-normed.bin');
     word2vec_dict = {}
     #words = model.wv.index2word  # order from model.wv.syn0
     final_words = [];
-    for i in noun_arr:
-        if i in model.wv.vocab:
-            word2vec_dict[i] = model.wv[i]
+    for i in ranked_words:
+        if i.getword() in model.wv.vocab:
+            word2vec_dict[i.getword()] = model.wv[i.getword()]
             #print('vector : ', word2vec_dict[i].T );
         #print("word2vec_dict[i] is ", word2vec_dict[i])
     #list of vectors
     X = [];
     words = [];
-    for i in noun_arr:
-        if i in word2vec_dict:
-            X.append(word2vec_dict[i].T);
-            words.append(i);
+    for i in ranked_words:
+        if i.getword() in word2vec_dict:
+            X.append(word2vec_dict[i.getword()].T);
+            words.append(i.getword());
         else:
             final_words.append(i);#Can use numpy array
     
@@ -109,14 +107,22 @@ def get_clusters(nouns):
     centroid_words = [];
     centroid_data_list = [];
     counter = 0;
+    data_cluster_list = [];
     for word_vec in final_centroid_map.keys():
         counter += 1;
         centroid_word, centroid_vector = model.most_similar(positive=[np.array(tuple(word_vec),dtype=dt)], topn=1)[0];
         print("Centroid : ", centroid_word);
         centroid_data_list.append(np.column_stack(([np.array(tuple(word_vec),dtype=dt)])))
         centroid_words.append(centroid_word);
+        data_clusters = [];
         for val_vec in final_centroid_map[word_vec]:
             data_word, data_vector = model.most_similar(positive=[np.array(tuple(val_vec),dtype=dt)], topn=1)[0];
-    centroids = np.array(centroid_data_list);
-    final_words.extend(centroid_words);
-    return final_words;
+            data_clusters.append(get_ranked_word(ranked_words, data_word));
+        data_cluster_list.append(data_clusters);
+    return final_words, data_cluster_list;
+
+
+def get_ranked_word(ranked_word_list, word):
+    for rw in ranked_word_list:
+        if word == rw.getword():
+            return rw;
