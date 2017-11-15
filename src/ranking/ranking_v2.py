@@ -24,11 +24,12 @@ def check_all_cases_rank(key,content,total_rank):
     return rank
         
 
-def do_rank(url,word):
+def do_rank(url,rank_obj):
     score = 0
     isPos = True 
-    rank_obj = RankedWord.RankedWord(word,isPos,score)
+   # rank_obj = RankedWord.RankedWord(word,isPos,score)
 
+    word = rank_obj.getword()
     print(URL_SCORE)
     
     req= requests.get(url)  #get the url request
