@@ -13,7 +13,7 @@ class RankedWord:
     def __lt__(self,other):
         return self.score < other.score
 
-    def __str__(self,other):
+    def __str__(self):
         return str('Word : ' + str(self.word) + " Rank : " + str(self.score))
 
     

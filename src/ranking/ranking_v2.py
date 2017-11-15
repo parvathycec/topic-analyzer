@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import RankedWord  #import the class file
+from __init__ import URL_SCORE 
 
 #url = 'https://en.wikipedia.org/wiki/Python_(programming_language)'
 url = "https://stackoverflow.com/questions/23238352/create-object-from-class-in-separate-file"
@@ -25,9 +26,10 @@ def check_all_cases_rank(key,content,total_rank):
 
 def do_rank(url,word):
     score = 0
+    isPos = True 
     rank_obj = RankedWord.RankedWord(word,isPos,score)
 
-    
+    print(URL_SCORE)
     
     req= requests.get(url)  #get the url request
     soup = BeautifulSoup(req.text,"lxml") #parse it through BeautifulSoup
