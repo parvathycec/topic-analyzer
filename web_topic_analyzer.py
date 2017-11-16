@@ -13,16 +13,31 @@ class WebTopicAnalyzer:
         #step 1: get content
         content = content_extraction.get_text(self.url);
         print(content);
+        if content == None:
+            raise Exception;
         #step 2: get NOUN word or phrases
         nouns = noun_extractor.get_nouns(content);
+        for nn in nouns:
+            print("@@", nn.getword());
         #step 3: ranking
         ranked_words = [];
         for w in nouns:
             ranked_word = ranking_v2.do_rank(self.url, w);
             ranked_words.append(ranked_word);
+        print("Lets see before grouping : ");
+        for w in ranked_words:
+            print(w.getword());
         #step 4: grouping of similar phrases and  eliminating repetition
         words, clusters = k_means.get_clusters(ranked_words);
         print("CLUSTERS >> ", clusters)
+        print("After grouping : ");
+        for w in words:
+            print("Not in Cluster : ", w.getword());
+        cluster_count = 0;
+        for cluster in clusters:
+            cluster_count += 1;
+            for data in cluster:
+                print("In cluster ", cluster_count, " Data : ", data.getword());
         final_ranked_words = [];
         final_ranked_words.extend(words)
         for data_cluster in clusters:
@@ -34,8 +49,9 @@ class WebTopicAnalyzer:
         for rw in final_ranked_words:
             print(rw.getword().upper(), " ", rw.getscore());
         
-        
-
-website_url = "http://news.bbc.co.uk/2/hi/health/2284783.stm"
+website_url = "https://www.politico.com/story/2017/11/15/trump-impeachment-democrats-244927"
 analyzer = WebTopicAnalyzer(website_url);
+#try:
 analyzer.process();
+#except:
+#    print("Something went wrong!");

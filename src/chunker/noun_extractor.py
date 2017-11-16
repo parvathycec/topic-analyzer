@@ -28,7 +28,7 @@ def get_nouns(content):
     #once we get noun candidates (individual words), we search wiki articles to 
     #see if there is any relates word phrase results that is also 
     #present in our web-content
-    wiki_results = [];
+    wiki_results = {};
     for noun in dict_nouns.values():
         print("Noun Candidate : ", noun)
         wiki_result = wikipedia.search(noun.getword(), results=20);
@@ -39,11 +39,11 @@ def get_nouns(content):
                 if (topic.lower() == noun.getword().lower()) or (len(topic.split()) == 1):# if it is not a phrase
                     continue;
                 print("Wiki Candidate >> ", topic);
-                wiki_results.append(RankedWord(topic.lower(), True));
+                wiki_results[topic.lower()] = RankedWord(topic.lower(), True);
     #Removing nouns already in wiki:
-    for wiki_val in wiki_results:
-        for val in wiki_val.getword().split():
+    for wiki_val in wiki_results.keys():
+        for val in wiki_val.split():
             for nn in list(dict_nouns):
                 if val in nn:
                     del dict_nouns[nn];
-    return list(dict_nouns.values())+wiki_results;
+    return list(dict_nouns.values())+list(wiki_results.values());
