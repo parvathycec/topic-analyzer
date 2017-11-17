@@ -58,10 +58,14 @@ def calculate_rank(key,content,total_rank):
         
 def calculate_url_score(url,word):
     #checks whether the word/phrase appears in the url,if it appears, then calculate a score accordingly
-    if " " in word: #if it is a phrase
-        word = word.replace(" ","-")   #replace the space in the word with -, because the url text is seperated by -
-    if word.lower() in url.lower():
-       return URL_SCORE
+    first_split = url.split("/")
+    second_split = first_split[ len(first_split)- 1]
+    url_content = second_split.split(".")
+    url_content = str(url_content[0])
+    url_content = url_content.replace("-"," ")
+    url_rank = calculate_rank(word,url_content,URL_SCORE)
+    return url_rank
+
 
 def calculate_nof_token(word):
     if " " in word: #if it is a phrase give additional rank score
@@ -178,6 +182,7 @@ def do_rank(url,rank_obj):
     
     no_of_token_score = 0
     no_of_token_score = calculate_nof_token(word)
+    print(no_of_token_score)
     
     if rank_obj.isPos == True:
         pos_score = POS_SCORE
@@ -190,15 +195,15 @@ def do_rank(url,rank_obj):
     
     
     total_rank = url_score + additional_meta_score + no_of_token_score +title_score + meta_score + h1_score + occurances_score + pos_score
-
-    print(url_score,additional_meta_score,no_of_token_score +title_score,meta_score,h1_score,occurances_score,pos_score)
+    print("url_score,additional_meta_score,no_of_token_score,title_score,meta_score,h1_score,occurances_score,pos_score")
+    print(url_score,additional_meta_score,no_of_token_score,title_score,meta_score,h1_score,occurances_score,pos_score)
     rank_obj.score = total_rank
 
     return rank_obj
 
 
 url = "https://www.nytimes.com/2017/11/16/nyregion/senator-robert-menendez-corruption.html"
-rank_obj = RankedWord.RankedWord("corruption case",True)
+rank_obj = RankedWord.RankedWord("tion",True)
 do_rank(url,rank_obj)
 print(rank_obj.score)
 
