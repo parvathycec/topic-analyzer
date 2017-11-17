@@ -7,36 +7,49 @@ from newspaper.article import ArticleException
 
 from __init__ import META_SCORE , NO_OF_TOKENS ,OCCURENCE_SCORE, POS_SCORE ,URL_SCORE, TITLE_SCORE ,H1_SCORE 
 
-def calculate_rank(key,content,total_rank,freq = 0):
+def check_for_consecutive_numbers(List):
+    if len(List) == (max(List) - min(List) + 1):
+        if len(List) == len(set(List)):
+            return True
+        else:
+            return False
+    else:
+        return False
 
-    if freq != 0:
-        rank =0
-        content = content.split(" ")
-        content = [x.lower() for x in content]
-        indices = []
-        if " " in key: #if it is a phrase
-            phrases = key.split(" ")
-            for p in phrases:
-                if p.lower() in content:
-                    indices.append(content.index(p.lower()))
+def calculate_rank(key,content,total_rank):
 
-                
-                else:
-                    return 0
-            #check if it is a consecutive number
+    rank =0
+    content = content.split(" ")
+    content = [x.lower() for x in content]
+    content = [x.replace(",","") for x in content]
+    content = [x.replace(".","") for x in content]
+    
+    indices = []
+    if " " in key: #if it is a phrase
+        phrases = key.split(" ")
+        for p in phrases:
+            if p.lower() in content:
+                indices.append(content.index(p.lower()))
 
-            if len(indices) == (max(indices) - min(indices) + 1):
-                len(indices) == len(set(indices)):
-                    return total_rank
+            
             else:
                 return 0
-        else: #if it is not a phrase
-            if key in content: 
-                return total_rank
+        #check if it is a consecutive number
+        # two conditions to be checked, n(len of the list) == max(list) - min(list) + 1 and no duplicates
 
-    else: #no of occurences
-        content = []
-        nfo =  
+        if (check_for_consecutive_numbers(indices) == True):
+            return total_rank
+        else:
+            return 0
+        
+       
+    else: #if it is not a phrase
+        if key in content: 
+            return total_rank
+        else:
+            return 0
+
+     
 
         
         
@@ -47,12 +60,11 @@ def calculate_url_score(url,word):
     #checks whether the word/phrase appears in the url,if it appears, then calculate a score accordingly
     if " " in word: #if it is a phrase
         word = word.replace(" ","-")   #replace the space in the word with -, because the url text is seperated by -
-    print("url")
-    print(check_all_cases_rank(word,url,URL_SCORE))
-    return check_all_cases_rank(word,url,URL_SCORE)
+    if word.lower() in url.lower():
+       return URL_SCORE
 
 def calculate_nof_token(word):
-    if " " in word:
+    if " " in word: #if it is a phrase give additional rank score
         nof_token_score = NO_OF_TOKENS
 
     else:
@@ -60,7 +72,7 @@ def calculate_nof_token(word):
 
     return nof_token_score
 
-    return nof_token_score
+   
 
 def calculate_title_score(soup,word):
     
@@ -70,15 +82,15 @@ def calculate_title_score(soup,word):
 
     
 def calculate_meta_score(soup,word):
-    meta_content = None
+    meta_content = ""
     for meta_tag in soup.findAll("meta"):
        meta_con =  meta_tag.get("content",None)
        if meta_con != None:
            meta_content += meta_con + " "
 
-    print("meta")      
+         
     #check whether the word occurs in the meta data and assign rank
-    if meta_content != None:
+    if meta_content != "":
 
         return calculate_rank(word,meta_content,META_SCORE)
         
@@ -113,8 +125,6 @@ def calculate_occurances_score(word,url):
         #article.nlp();
         article_content = article.title
 
-    if " " in word:
-        
         
     if " " in word: #if there is a space in between the word, then it is considered as a phrase
         score = article_content.count(word)
@@ -134,8 +144,6 @@ def calculate_occurances_score(word,url):
 
         score = score_1 + score_2 + score_3 + score_4
 
-    print("freq")
-    print(score * OCCURENCE_SCORE)
     return (score * OCCURENCE_SCORE)
 
         
@@ -176,19 +184,21 @@ def do_rank(url,rank_obj):
 
     additional_meta_score = 0
 
-    if pos_score!= 0 and title_score != 0:
+    if pos_score != 0 and title_score != 0:
         additional_meta_score = 50
     #total rank
     
-    total_rank = url_score + additional_meta_score + no_of_token_score +title_score + meta_score + h1_score + occurances_score + pos_score
     
+    total_rank = url_score + additional_meta_score + no_of_token_score +title_score + meta_score + h1_score + occurances_score + pos_score
+
+    print(url_score,additional_meta_score,no_of_token_score +title_score,meta_score,h1_score,occurances_score,pos_score)
     rank_obj.score = total_rank
 
     return rank_obj
 
-'''
-url = "https://www.washingtonpost.com/investigations/two-more-women-describe-unwanted-overtures-by-roy-moore-at-alabama-mall/2017/11/15/2a1da432-ca24-11e7-b0cf-7689a9f2d84e_story.html?utm_term=.e749f39597da"
-rank_obj = RankedWord.RankedWord("investigations",True)
+
+url = "https://www.nytimes.com/2017/11/16/nyregion/senator-robert-menendez-corruption.html"
+rank_obj = RankedWord.RankedWord("corruption case",True)
 do_rank(url,rank_obj)
 print(rank_obj.score)
-'''
+
