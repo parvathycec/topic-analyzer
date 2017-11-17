@@ -19,16 +19,26 @@ def calculate_rank(key,content,total_rank,freq = 0):
             for p in phrases:
                 if p.lower() in content:
                     indices.append(content.index(p.lower()))
+
+                
                 else:
                     return 0
-        else:
-            if key in content:
-                rank = total_rank
-                return rank
+            #check if it is a consecutive number
+
+            if len(indices) == (max(indices) - min(indices) + 1):
+                len(indices) == len(set(indices)):
+                    return total_rank
+            else:
+                return 0
+        else: #if it is not a phrase
+            if key in content: 
+                return total_rank
 
     else: #no of occurences
+        content = []
+        nfo =  
 
-        rank
+        
         
                 
 
