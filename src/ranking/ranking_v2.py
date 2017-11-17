@@ -5,7 +5,7 @@ from newspaper import Article
 from newspaper.article import ArticleException
 
 
-from __init__ import META_SCORE , NO_OF_TOKENS ,OCCURENCE_SCORE, POS_SCORE ,URL_SCORE, TITLE_SCORE ,H1_SCORE 
+#from __init__ import META_SCORE , NO_OF_TOKENS ,OCCURENCE_SCORE, POS_SCORE ,URL_SCORE, TITLE_SCORE ,H1_SCORE 
 
 def check_for_consecutive_numbers(List):
     if len(List) == (max(List) - min(List) + 1):
@@ -202,8 +202,8 @@ def do_rank(url,rank_obj):
     return rank_obj
 
 
-url = "https://www.nytimes.com/2017/11/16/nyregion/senator-robert-menendez-corruption.html"
-rank_obj = RankedWord.RankedWord("tion",True)
-do_rank(url,rank_obj)
-print(rank_obj.score)
+#url = "https://www.nytimes.com/2017/11/16/nyregion/senator-robert-menendez-corruption.html"#
+#rank_obj = RankedWord.RankedWord("menendez corruption",True)
+#do_rank(url,rank_obj)
+#print(rank_obj.score)
 
