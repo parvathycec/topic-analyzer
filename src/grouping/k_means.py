@@ -97,10 +97,31 @@ def get_clusters(ranked_words):
     
     #step 1: pick K random points as cluster
     #print(X);
-    k=round(sqrt(len(X)/2));#randomly choose k elements
-    print("*******************", k)
+   # K=range(10);#round(sqrt(len(X)/2));#randomly choose k elements
+    sum_distance_arr = [];
+    for k in range(1, 10):
+        print("*******************", k)
+        centroid_list = random.sample(X, k);
+        final_centroid_map = get_centroid(centroid_list, X);
+        sum_distance = 0;
+        for centroid_key in final_centroid_map.keys():
+            for data_value in final_centroid_map[centroid_key]:
+               sum_distance += euclidian_distance(centroid_key, data_value)
+        print(sum_distance);
+        sum_distance_arr.append(sum_distance);
+    list_val = [abs(t - s) for s, t in zip(sum_distance_arr, sum_distance_arr[1:])];
+    print(list_val);
+  #  print(min(list_val))
+    k = list_val.index(min(list_val))+1;
+    print("Final *******************", k)
     centroid_list = random.sample(X, k);
     final_centroid_map = get_centroid(centroid_list, X);
+    sum_distance = 0;
+    for centroid_key in final_centroid_map.keys():
+        for data_value in final_centroid_map[centroid_key]:
+           sum_distance += euclidian_distance(centroid_key, data_value)
+    print(sum_distance);
+    sum_distance_arr.append(sum_distance);
     dt=np.dtype('float32')
     model = KeyedVectors.load('GoogleNews-vectors-gensim-normed.bin', mmap='r')
     model.syn0norm = model.syn0  # prevent recalc of normed vectors
