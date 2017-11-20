@@ -44,14 +44,11 @@ def on_extract():
         progress_bar_label.pack(expand = True,fill = "both", side = "top")
         progress_bar_label.start()
 
-        i = 0
-
-        while(i < 1000000):
-            i += 1
+      
         
         
-        
-        tokens = words.getWords()
+                
+        tokens = words.getWords()  ## i get the 15 selected words here
         label_op1.config(text = "Tokens for the webpage", height = 3, anchor = "center", fg = "brown" , font = ("calibri",20))
         label_op1.pack(side = "top")
         
@@ -65,7 +62,7 @@ def on_extract():
             else:
                 labels[label_index].config(text = str(tokens[label_index]))
                 labels[label_index].pack(fill= "x",side = "left")
-        progress_bar_label.stop()
+        progress_bar_label.destroy()
     else:
         no_url()
           
@@ -78,9 +75,9 @@ def on_extract():
 master = tkinter.Tk()
 master.geometry("1000x1000+0+0")
 frame_header = tkinter.Frame(master,height = 50,width = 1000)
-frame_url = tkinter.Frame(master,height = 25,width = 1000)
-frame_buttons = tkinter.Frame(master,height = 25,width = 1000)
-frame_progress_bar = tkinter.Frame(master,height = 25, width = 1000)
+frame_url = tkinter.Frame(master,height = 50,width = 1000)
+frame_buttons = tkinter.Frame(master,height = 50,width = 1000)
+frame_progress_bar = tkinter.Frame(master,height = 50, width = 1000)
 frame_output_heading = tkinter.Frame(master,height = 200,width = 1000)
 frame_output_set_1 = tkinter.Frame(master,height = 200,width = 1000)
 frame_output_set_2 = tkinter.Frame(master,height = 200,width = 1000)
@@ -135,11 +132,11 @@ labels= []
 for i in range(15):
      label_text = "Label_" + str(i)
      if i < 5:
-         label = tkinter.Label(frame_output_set_1, height =  2,justify = "center", anchor = "center",font = "Calibri", fg = "brown", relief = "ridge",wrap_length = 30,width = 25, padx = 5)
+         label = tkinter.Label(frame_output_set_1, height = 3, justify = "center", anchor = "center",pady = 2,font = "Calibri", fg= "brown",wraplength = 250, relief = "ridge",width = 20, padx = 5)
      if i >=5 and i < 10:
-         label = tkinter.Label(frame_output_set_2, height =  2, justify = "center",anchor = "center",font = "Calibri", fg = "brown", relief = "ridge",width = 25, padx = 5)
+         label = tkinter.Label(frame_output_set_2, height = 3 ,justify = "center",anchor = "center",pady = 2,font = "Calibri", fg = "brown",wraplength = 250 ,relief = "ridge",width = 20, padx = 5)
      if i >= 10:
-         label = tkinter.Label(frame_output_set_3, height =  2,justify = "center",anchor = "center", font = "Calibri", fg = "brown", relief = "ridge",width = 25, padx = 5)
+         label = tkinter.Label(frame_output_set_3,height = 3, justify = "center",anchor = "center",pady = 2, font = "Calibri", fg = "brown",wraplength = 250, relief = "ridge",width = 20, padx = 5)
      labels.append(label)
 
 #progress bar
