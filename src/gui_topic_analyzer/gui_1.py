@@ -10,8 +10,6 @@ tokens = []
 
 def check_url(url):
     try:
-        print("Im inside")
-        print(url)
         request = requests.get(url)
         if request.status_code == 200:
             
@@ -38,7 +36,6 @@ def on_extract():
     actual_url = current_url.get()
 
 
-    print(actual_url)
     if check_url(actual_url) == True:
         progress_bar_label = ttk.Progressbar(frame_progress_bar,orient='horizontal', mode='indeterminate')
         progress_bar_label.pack(expand = True,fill = "both", side = "top")
