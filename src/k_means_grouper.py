@@ -1,6 +1,8 @@
-#TODO: scatter plot
-#TODO: How to find K
-#TODO: Clean and rename some variables in this file
+#Step 4: To remove keywords that are similar
+#This is to bring more diversity to the top ranked keywords
+#We use an algorithm called k-means for this.
+#The K-means algorithm is implemented using numpy arrays for computation
+#We use GoogleNews pre-trained dataset to compute word2vec.
 from math import sqrt
 import os
 import random

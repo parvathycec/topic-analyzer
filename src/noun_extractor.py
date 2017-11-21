@@ -1,3 +1,10 @@
+#Step 2 of the algorithm
+#Uses third party library called Spacy and wikipedia
+#Spacy identifies nouns as potential keywords from the content
+#For each identified noun word, we do a search in 
+#wikipedia to get some search results.
+#If any of the search result is in article content, that phrase is 
+#taken as a potential keyword too. 
 import spacy
 import wikipedia
 from ranked_word import RankedWord

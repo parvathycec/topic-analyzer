@@ -1,3 +1,5 @@
+#Step 1 of the algorithm: Extracts content of the article 
+#using third party library newspaper article.
 from newspaper import Article
 from newspaper.article import ArticleException
 
