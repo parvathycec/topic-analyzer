@@ -30,7 +30,7 @@ def on_reset():
     progress_bar_label.pack_forget()
         
 def no_url():
-    tkinter.messagebox.showerror("Error","Website does not exist")
+    tkinter.messagebox.showerror("Error","Website does not exist or it is forbidden, Please check it!")
 
 def on_extract():
     #pack the label
