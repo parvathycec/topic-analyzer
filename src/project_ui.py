@@ -3,7 +3,7 @@ from tkinter import messagebox
 import tkinter.ttk as ttk
 
 actual_url = ""
-import words
+#import words
 import requests
 
 tokens = []
