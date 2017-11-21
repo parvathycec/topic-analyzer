@@ -8,7 +8,9 @@ from gensim import models
 from gensim.models.keyedvectors import KeyedVectors
 from numpy import float32
 import numpy as np
-from grouping import model_path
+
+
+MODEL_PATH = 'C:/Users/parvathy/Documents/UNH/Fall 2017/Python/Project/data.model/GoogleNews-vectors-negative300.bin'
 
 def euclidian_distance(vector1, vector2):
     """Find euclidian distance between two vectors"""
@@ -74,7 +76,7 @@ def get_centroid(centroid_list, X):
         
 def get_clusters(ranked_words):
 
-    model = models.KeyedVectors.load_word2vec_format(os.path.join(os.path.dirname(__file__), model_path), binary=True, limit=50000)
+    model = models.KeyedVectors.load_word2vec_format(os.path.join(os.path.dirname(__file__), MODEL_PATH), binary=True, limit=50000)
     model.init_sims(replace=True)
     model.save('GoogleNews-vectors-gensim-normed.bin');
     word2vec_dict = {}
@@ -109,10 +111,13 @@ def get_clusters(ranked_words):
                sum_distance += euclidian_distance(centroid_key, data_value)
         print(sum_distance);
         sum_distance_arr.append(sum_distance);
-    list_val = [abs(t - s) for s, t in zip(sum_distance_arr, sum_distance_arr[1:])];
-    print(list_val);
-  #  print(min(list_val))
-    k = list_val.index(min(list_val))+1;
+        if(sum_distance == 0):
+            break;
+    k = 1;
+    if len(sum_distance_arr) > 1:
+        list_val = [abs(t - s) for s, t in zip(sum_distance_arr, sum_distance_arr[1:])];
+        print(list_val);
+        k = list_val.index(min(list_val))+1;
     print("Final *******************", k)
     centroid_list = random.sample(X, k);
     final_centroid_map = get_centroid(centroid_list, X);

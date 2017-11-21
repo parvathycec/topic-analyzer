@@ -1,11 +1,13 @@
 import spacy
 import wikipedia
-from ranking.RankedWord import RankedWord
+from ranked_word import RankedWord
+from time import sleep
 
-def get_nouns(content):
+def get_nouns(title, content):
     """Get all noun chunks from the text extracted from website
     and get related word phrases from wikipedia search"""
     nlp = spacy.load('en');#,vectors='en_google')
+    content = title + " " + content;
     doc = nlp(content)
     dict_nouns = {};
     for token in doc:
@@ -16,13 +18,19 @@ def get_nouns(content):
         #1) If word is a proper noun and not too short word length 
         #2)If word is a noun that is not too short and not belonging to WH words like who, what, where.
         #3)We dont need Date nouns.
-        if (token.pos_ == 'PROPN' and len(token.text) > 2) or \
+        #4)We dont want proper nouns who dont have a definite entity type.
+        if (token.pos_ == 'PROPN' and len(token.text) > 2 and token.ent_type_ != "") or \
         (token.pos_ == 'NOUN' and token.tag_ != 'WP' and len(token.text) > 3):
             if(token.ent_type_ != 'DATE'):
                 wr = RankedWord(token.text.lower(), (token.pos_ == 'PROPN'))
                 if (wr.getword() not in dict_nouns):
                     dict_nouns [wr.getword()] = wr;
+                    print("Putting from Spacy  : ", wr.getword());
+            elif token.text.lower() in dict_nouns:
+                print("Deleting from Spacy  2 : ", token.text.lower());
+                del dict_nouns[token.text.lower()];
         elif token.text.lower() in dict_nouns:
+            print("Deleting from Spacy  2 : ", token.text.lower());
             del dict_nouns[token.text.lower()];#remove if it is not a noun in another context
     
     #once we get noun candidates (individual words), we search wiki articles to 
@@ -31,11 +39,18 @@ def get_nouns(content):
     wiki_results = {};
     for noun in dict_nouns.values():
         print("Noun Candidate : ", noun)
-        wiki_result = wikipedia.search(noun.getword(), results=20);
+        #if(not noun.isPos):
+        #    print("No wiki search for non-proper noun");
+        #    continue;
+        try:
+            wiki_result = wikipedia.search(noun.getword(), results=20);
+        except:
+            sleep(5);
+            continue;
         #print("Wiki : ", wiki_result);
         for wiki_topic in wiki_result:
             wiki_topic = wiki_topic.lower();
-            print("wiki_topic ", wiki_topic);
+           # print("wiki_topic ", wiki_topic);
             topics = wiki_topic.split();
             #for easier comparison, converting to lower case
             #We need only phrases here, don't need words as it would be duplicate
@@ -44,7 +59,7 @@ def get_nouns(content):
             #Wiki results will get the phrase Statue of Liberty and if it is in web page, 
             #this phrase is a potential candidate
             #https://en.wikipedia.org/wiki/Wikipedia:Article_titles#Deciding_on_an_article_title
-            if len(topics) > 0  and (wiki_topic.lower() in content.lower()):
+            if len(topics) > 1  and (wiki_topic.lower() in content.lower() or wiki_topic.lower()+" " in content.lower()):
                 if (wiki_topic == noun.getword()):#avoid duplicates
                     continue;
                 #Dont want cases like "The Case" where we get a result as "The <existing_noun_candidate"
@@ -53,17 +68,18 @@ def get_nouns(content):
                 #IF first word and last word are both proper nouns, consider it a candidate
                 #We don't need cases like "by chance" coming up.
                 #Need to revist
-                first_w = None;
-                last_w = None;
-                if(topics[0] in dict_nouns):
-                    first_w = dict_nouns[topics[0]]
-                if(topics[-1] in dict_nouns):
-                    last_w = dict_nouns[topics[-1]]
-                if (first_w and last_w):
-                    if (first_w.isPos and  last_w.isPos):
-                        print("Wiki Candidate >> ", wiki_topic);
+                #first_w = None;
+                #last_w = None;
+                #if(topics[0] in dict_nouns):
+                #    first_w = dict_nouns[topics[0]]
+                #if(topics[-1] in dict_nouns):
+                #    last_w = dict_nouns[topics[-1]]
+                #if (first_w and last_w):
+                #    if (first_w.isPos and  last_w.isPos):
+                #        print("Wiki Candidate >> ", wiki_topic);
                         #Need to revist : Pos True or give separate variable wiki true
-                        wiki_results[wiki_topic.lower()] = RankedWord(wiki_topic.lower(), True);
+                wiki_results[wiki_topic.lower().rstrip().lstrip()] = RankedWord(wiki_topic.lower().rstrip().lstrip(), noun.isPos);
+                print("Putting from Wiki : ", wiki_topic.lower().rstrip().lstrip());
             elif (',' in wiki_topic) and any(t in content.lower() for t in wiki_topic.lower().split(",")):
                 phrases = wiki_topic.lower().split(",");
                 for phrase in phrases:
@@ -71,7 +87,8 @@ def get_nouns(content):
                         print(phrase, " ", all(t in dict_nouns.keys() for t in phrase.split()));
                         for ph in phrase.split():
                             if ph in dict_nouns and dict_nouns[ph].isPos:
-                                wiki_results[phrase.lstrip().rstrip()] = RankedWord(phrase.lstrip().rstrip(), True);
+                                wiki_results[phrase.lstrip().rstrip()] = RankedWord(phrase.lstrip().rstrip(), noun.isPos);
+                                print("Putting from Wiki 2 : ", phrase.lstrip().rstrip());
                                 break;
     #Removing nouns already in wiki:
     for wiki_val in wiki_results.keys():
@@ -79,4 +96,5 @@ def get_nouns(content):
             for nn in list(dict_nouns):
                 if val == nn:
                     del dict_nouns[nn];
+                    print("Deleting from Spacy 3 : ", wr.getword());
     return list(dict_nouns.values())+list(wiki_results.values());

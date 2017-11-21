@@ -11,4 +11,4 @@ def get_text(url):
     else:
         article.parse();
         article.nlp();
-        return article.title + " " +article.text;
+        return (article.title, article.text);

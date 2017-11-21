@@ -1,6 +1,8 @@
 import tkinter
 from tkinter import messagebox
 import tkinter.ttk as ttk
+from web_topic_analyzer import WebTopicAnalyzer
+import datetime
 
 actual_url = ""
 #import words
@@ -42,23 +44,30 @@ def on_extract():
         progress_bar_label.start()
 
       
+        a = datetime.datetime.now()
+        analyzer = WebTopicAnalyzer(actual_url);
+        try:
+           tokens = analyzer.process();
+           label_op1.config(text = "Tokens for the webpage", height = 3, anchor = "center", fg = "brown" , font = ("calibri",20))
+           label_op1.pack(side = "top")
         
-        
-                
-        tokens = words.getWords()  ## i get the 15 selected words here
-        label_op1.config(text = "Tokens for the webpage", height = 3, anchor = "center", fg = "brown" , font = ("calibri",20))
-        label_op1.pack(side = "top")
-        
-        for label_index in range(len(tokens)):
-            if label_index < 5:
-                labels[label_index].config(text = str(tokens[label_index]))
-                labels[label_index].pack(fill= "x",side = "left")
-            elif label_index >= 5 and label_index < 10:
-                labels[label_index].config(text = str(tokens[label_index]))
-                labels[label_index].pack(fill= "x",side = "left")
-            else:
-                labels[label_index].config(text = str(tokens[label_index]))
-                labels[label_index].pack(fill= "x",side = "left")
+           for label_index in range(len(tokens)):
+                if label_index < 5:
+                    labels[label_index].config(text = str(tokens[label_index]))
+                    labels[label_index].pack(fill= "x",side = "left")
+                elif label_index >= 5 and label_index < 10:
+                    labels[label_index].config(text = str(tokens[label_index]))
+                    labels[label_index].pack(fill= "x",side = "left")
+                else:
+                    labels[label_index].config(text = str(tokens[label_index]))
+                    labels[label_index].pack(fill= "x",side = "left")
+        except Exception as ex:
+            print(ex);
+            #TODO: How to show error message in ui
+            
+        b = datetime.datetime.now()
+        c = b - a
+        print("Total time taken : ", c.seconds, " seconds")
         progress_bar_label.destroy()
     else:
         no_url()
