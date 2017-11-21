@@ -1,10 +1,4 @@
-import requests
-from bs4 import BeautifulSoup
 import ranked_word  #import the class file
-from newspaper import Article
-from newspaper.article import ArticleException
-
-#global scores
 
 URL_SCORE = 100
 TITLE_SCORE = 100
@@ -15,7 +9,7 @@ POS_SCORE = 100
 NO_OF_TOKENS =100
 
 
-#from __init__ import META_SCORE , NO_OF_TOKENS ,OCCURENCE_SCORE, POS_SCORE ,URL_SCORE, TITLE_SCORE ,H1_SCORE 
+
 
 def check_for_consecutive_numbers(List):
     if len(List) == (max(List) - min(List) + 1):
@@ -88,37 +82,29 @@ def calculate_nof_token(word):
 
    
 
-def calculate_title_score(soup,word):
-    
-    title_content = soup.title.string
-
+def calculate_title_score(word, title_content):
+    #title_content = soup.title.string
+    print("TITLE : ", title_content);
     return calculate_rank(word,title_content,TITLE_SCORE)
 
     
-def calculate_meta_score(soup,word):
-    meta_content = ""
-    for meta_tag in soup.findAll("meta"):
-       meta_con =  meta_tag.get("content",None)
-       if meta_con != None:
-           meta_content += meta_con + " "
-
-         
+def calculate_meta_score(word, meta_content):
+    #meta_content = ""
+    #for meta_tag in soup.findAll("meta"):
+    #   meta_con =  meta_tag.get("content",None)
+    #   if meta_con != None:
+    #       meta_content += meta_con + " "
     #check whether the word occurs in the meta data and assign rank
     if meta_content != "":
-
         return calculate_rank(word,meta_content,META_SCORE)
         
     else:
         return 0
 
-def calculate_h1_score(soup,word):
-    h1_tag_content = None
-    for h1_tag in soup.find_all("h1"):
-        h1_tag_content = h1_tag.string
-        
-   
-    
-
+def calculate_h1_score(word, h1_tag_content):
+    #h1_tag_content = None
+    #for h1_tag in soup.find_all("h1"):
+    #    h1_tag_content = h1_tag.string
     #if the word appears in the h1, then assign rank accordingly
     if h1_tag_content != None:
         h1_tag_rank = calculate_rank(word,h1_tag_content,H1_SCORE)
@@ -127,28 +113,28 @@ def calculate_h1_score(soup,word):
         
     return h1_tag_rank
         
-def calculate_occurances_score(word,url):
-    article = Article(url)
-    try:
-        article.download()
-    except ArticleException:
-        print("Check your URL or network connection");
-        return None;
-    else:
-        article.parse();
+def calculate_occurances_score(word,article_content):
+    #article = Article(url)
+    #try:
+    #    article.download()
+    #except ArticleException:
+    #    print("Check your URL or network connection");
+    #    return None;
+    #else:
+    #    article.parse();
         #article.nlp();
-        article_content = article.title
+    #    article_content = article.title
 
         
     if " " in word: #if there is a space in between the word, then it is considered as a phrase
-        score = article_content.count(word)
+        score = article_content.lower().count(word)
         
         
         #score = check_all_cases_rank(word,article_content,OCCURENCE_SCORE)
 
     else:
 
-        article_content_words = article_content.split(" ")
+        article_content_words = article_content.lower().split(" ")
         article_content_words
 
         score_1 = article_content_words.count(word)
@@ -165,13 +151,13 @@ def calculate_occurances_score(word,url):
         
     
     
-def do_rank(url,rank_obj):
+def do_rank(url,rank_obj, content, title_content, meta_tag_content, h1_tag_content):
    # rank_obj = RankedWord.RankedWord(word,isPos,score)
 
     word = rank_obj.getword()
 
-    req= requests.get(url)  #get the url request
-    soup = BeautifulSoup(req.text,"lxml") #parse it through BeautifulSoup
+    #req= requests.get(url)  #get the url request
+    #soup = BeautifulSoup(req.text,"lxml") #parse it through BeautifulSoup
     #initialise the variables to hold the rank values
     url_score = 0
     title_score = 0
@@ -182,13 +168,13 @@ def do_rank(url,rank_obj):
     
     url_score = calculate_url_score(url,word)
 
-    title_score = calculate_title_score(soup,word)
+    title_score = calculate_title_score(word, title_content)
     
-    meta_score =  calculate_meta_score(soup,word)
+    meta_score =  calculate_meta_score(word, meta_tag_content)
 
-    h1_score = calculate_h1_score(soup,word)
+    h1_score = calculate_h1_score(word, h1_tag_content)
 
-    occurances_score = calculate_occurances_score(word,url)
+    occurances_score = calculate_occurances_score(word,content)
     
     no_of_token_score = 0
     no_of_token_score = calculate_nof_token(word)
@@ -205,9 +191,38 @@ def do_rank(url,rank_obj):
     
     
     total_rank = url_score + additional_meta_score + no_of_token_score +title_score + meta_score + h1_score + occurances_score + pos_score
-    print("url_score,additional_meta_score,no_of_token_score,title_score,meta_score,h1_score,occurances_score,pos_score")
-    print(url_score,additional_meta_score,no_of_token_score,title_score,meta_score,h1_score,occurances_score,pos_score)
-    rank_obj.score = total_rank
+    rank_obj.score = total_rank;
+    """ if((pos_score > 0) and (title_score > 0) and occurances_score > 10):
+        rank_obj.score = 10;
+    elif((pos_score > 0) and (title_score > 0)):
+        rank_obj.score = 9;
+    elif((pos_score == 0) and (title_score > 0)):
+        rank_obj.score = 9;
+    elif((pos_score > 0) and (h1_score > 0 or meta_score > 0)):
+        rank_obj.score = 9;
+    elif((pos_score > 0) and (additional_meta_score > 0)):
+        rank_obj.score = 8;
+    elif((pos_score > 0) and (occurances_score > 10)):
+        rank_obj.score = 7;
+    elif((pos_score > 0) and (no_of_token_score > 0)):
+        rank_obj.score = 6;
+    elif((pos_score == 0) and (h1_score > 0 or meta_score > 0)):
+        rank_obj.score = 5;
+    elif((pos_score == 0) and (additional_meta_score > 0)):
+        rank_obj.score = 4;
+    elif((pos_score > 0) and (occurances_score >10)):
+        rank_obj.score = 3;
+    elif((pos_score == 0) and (no_of_token_score > 0)):
+        rank_obj.score = 2;
+    elif((pos_score == 0) and (occurances_score >10)):
+        rank_obj.score = 1;"""
+    #print("url_score,additional_meta_score,no_of_token_score,title_score,meta_score,h1_score,occurances_score,pos_score")
+    #print(url_score,additional_meta_score,no_of_token_score,title_score,meta_score,h1_score,occurances_score,pos_score)
+    print(word, " : url : ", url_score, ", title : ", title_score, ", meta : ", meta_score, ", h1 : ", h1_score, ", occurence : ", occurances_score,
+          ", pos : ", pos_score, ", additional : ", additional_meta_score, " no_of_token_score : ", no_of_token_score);
+    print("Total ", total_rank);
+    
+    #rank_obj.score = total_rank
 
     return rank_obj
 
@@ -216,4 +231,3 @@ def do_rank(url,rank_obj):
 #rank_obj = RankedWord.RankedWord("menendez corruption",True)
 #do_rank(url,rank_obj)
 #print(rank_obj.score)
-
