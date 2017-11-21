@@ -8,6 +8,7 @@ def get_nouns(title, content):
     and get related word phrases from wikipedia search"""
     nlp = spacy.load('en');#,vectors='en_google')
     content = title + " " + content;
+    print(content);
     doc = nlp(content)
     dict_nouns = {};
     for token in doc:
