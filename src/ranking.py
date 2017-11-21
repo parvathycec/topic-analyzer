@@ -1,8 +1,18 @@
 import requests
 from bs4 import BeautifulSoup
-import RankedWord  #import the class file
+import ranked_word  #import the class file
 from newspaper import Article
 from newspaper.article import ArticleException
+
+#global scores
+
+URL_SCORE = 100
+TITLE_SCORE = 100
+H1_SCORE = 100
+META_SCORE = 100
+OCCURENCE_SCORE = 5
+POS_SCORE = 100
+NO_OF_TOKENS =100
 
 
 #from __init__ import META_SCORE , NO_OF_TOKENS ,OCCURENCE_SCORE, POS_SCORE ,URL_SCORE, TITLE_SCORE ,H1_SCORE 
