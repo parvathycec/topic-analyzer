@@ -10,6 +10,8 @@ import noun_extractor
 import k_means_grouper
 import operator
 import ranking
+from nltk.tokenize import word_tokenize
+
 
 class WebTopicAnalyzer:
     """Analyzer to analyze the topics related to a web page"""
@@ -21,6 +23,8 @@ class WebTopicAnalyzer:
             #step 1: get text content and title
             title, content = content_extraction.get_text(self.__url);
             print(content);
+            gen_docs = [w.lower() for w in word_tokenize(content)] 
+            token_relevance = k_means_grouper.get_relevance(gen_docs);
             #step 2: Get all title, h1, meta tags of the web page.
             title_content, meta_content, h1_tag_content = html_parser.parse_html(self.__url);
             print("Title content : ", title_content);
@@ -53,6 +57,18 @@ class WebTopicAnalyzer:
                 data_cluster.sort(key=operator.attrgetter('score'), reverse=True)
                 #Taking the most ranked word of the cluster
                 final_ranked_words.append(data_cluster[0]);
+            print("Going to print...")
+            for k in final_ranked_words:
+                sum = 0;
+                for each_k in k.getword().split():
+                    print("each_k ", each_k);
+                    if each_k in token_relevance:
+                        print('Token relevance ', token_relevance[each_k]);
+                        sum += token_relevance[each_k];
+                        print("sum ", sum)
+                sum = sum/len(k.getword().split());
+                k.score += sum;
+                print("word ", k.getword(), " ", k.getscore())
             print("------------TOP 15--------------")
             #sort the final list of ranked words
             final_ranked_words.sort(key=operator.attrgetter('score'), reverse=True)
@@ -61,11 +77,12 @@ class WebTopicAnalyzer:
             #Will show first 15 ranked keywords
             for rw in final_ranked_words:
                 count += 1;
-                print(rw.getword().title(), " ", rw.getscore());
+                print(rw.getword(), " ", rw.getscore());
                 if len(key_words) == 15:
                     break;
                 else:
-                    key_words.append(rw.getword().upper());
+                    key_words.append(rw.getword());
+            return {'words' : key_words};
         except Exception as e:
             print(e);
             return {"error": "Sorry, something went wrong!"};

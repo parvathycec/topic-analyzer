@@ -4,13 +4,15 @@ This is to bring more diversity to the top ranked keywords
 We use an algorithm called k-means for this.
 The K-means algorithm is implemented using numpy arrays for computation
 We use GoogleNews pre-trained dataset to compute word2vec.
+MODEL_PATH should point to the dataset location. Tested only in Windows.
 @author: Parvathy
 '''
 
 from math import sqrt
 import os
 import random
-from gensim import models
+from gensim import corpora, models, similarities
+from gensim.corpora import TextCorpus, MmCorpus, Dictionary
 from gensim.models.keyedvectors import KeyedVectors
 from numpy import float32
 import numpy as np
@@ -87,6 +89,8 @@ def get_clusters(ranked_words):
     word2vec_dict = {}
     #words = model.wv.index2word  # order from model.wv.syn0
     final_words = [];
+    words = [];
+    
     for i in ranked_words:
         if i.getword() in model.wv.vocab:
             word2vec_dict[i.getword()] = model.wv[i.getword()]
@@ -158,3 +162,22 @@ def get_ranked_word(ranked_word_list, word):
     for rw in ranked_word_list:
         if word == rw.getword():
             return rw;
+        
+def get_relevance(words):
+    texts = [[word for word in rw.lower().split()] for rw in words]
+    print(texts)
+    dictionary = corpora.Dictionary(texts)
+    corpus = [dictionary.doc2bow(text) for text in texts]
+
+    tfidf = models.TfidfModel(corpus)
+    corpus_tfidf = tfidf[corpus]
+    d = {}
+    for doc in corpus_tfidf:
+        for id, value in doc:
+            word = dictionary.get(id)
+            print('Word : ', word)
+            print('Value : ',value)
+            d[word] = value;
+    #sorted(d, key=lambda k: d[k][1])
+    return d;
+                
