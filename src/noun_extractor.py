@@ -52,7 +52,8 @@ def get_nouns(title, content):
         #    continue;
         try:
             wiki_result = wikipedia.search(noun.getword(), results=20);
-        except:
+        except:#sometimes, connection is refused because our application exceeds maximum trys.
+            #So sleep for 5 seconds before doing next search.
             sleep(5);
             continue;
         #print("Wiki : ", wiki_result);
@@ -73,19 +74,6 @@ def get_nouns(title, content):
                 #Dont want cases like "The Case" where we get a result as "The <existing_noun_candidate"
                 if(len(topics) == 2 and topics[0] == "the"):
                     continue;
-                #IF first word and last word are both proper nouns, consider it a candidate
-                #We don't need cases like "by chance" coming up.
-                #Need to revist
-                #first_w = None;
-                #last_w = None;
-                #if(topics[0] in dict_nouns):
-                #    first_w = dict_nouns[topics[0]]
-                #if(topics[-1] in dict_nouns):
-                #    last_w = dict_nouns[topics[-1]]
-                #if (first_w and last_w):
-                #    if (first_w.isPos and  last_w.isPos):
-                #        print("Wiki Candidate >> ", wiki_topic);
-                        #Need to revist : Pos True or give separate variable wiki true
                 wiki_results[wiki_topic.lower().rstrip().lstrip()] = RankedWord(wiki_topic.lower().rstrip().lstrip(), noun.isPos);
                 print("Putting from Wiki : ", wiki_topic.lower().rstrip().lstrip());
             elif (',' in wiki_topic) and any(t in content.lower() for t in wiki_topic.lower().split(",")):
