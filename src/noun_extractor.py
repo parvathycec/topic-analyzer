@@ -36,10 +36,10 @@ def get_nouns(title, content):
             wiki_phrase = search_wiki(noun, article_content, dict_nouns);
             if wiki_phrase is not None:
                 wiki_results[wiki_phrase.rstrip().lstrip()] = RankedWord(wiki_phrase.rstrip().lstrip(), noun.isPos);
-    noun_chunks = extract_title_nouns(title);
+  #  noun_chunks = extract_title_nouns(title);
     #To merge two dictionaries
     #Reference: https://stackoverflow.com/questions/38987/how-to-merge-two-dictionaries-in-a-single-expression
-    wiki_results.update(noun_chunks);
+   # wiki_results.update(noun_chunks);
     #Removing nouns already in wiki:
     remove_duplicates(dict_nouns, wiki_results);
     wiki_results_copy = copy.deepcopy(wiki_results)
@@ -136,9 +136,9 @@ def remove_duplicates(dict_nouns, wiki_results):
             for i in range(1, len(wiki_val_arr)+1):
                 iter_k = combinations(wiki_val_arr, i)
                 curr_combination = ' '.join(iter_k.__next__());
-                print("curr_combination ", curr_combination);
+                #print("curr_combination ", curr_combination);
                 for nn in list(dict_nouns):
-                    print("nn ", nn);
+                    #print("nn ", nn);
                     if curr_combination.rstrip().lstrip() == nn.rstrip().lstrip() and (curr_combination.rstrip().lstrip() != wiki_val.rstrip().lstrip()):
                         print("Deleting")
                         del dict_nouns[nn.rstrip().lstrip()];
