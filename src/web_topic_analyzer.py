@@ -22,14 +22,14 @@ class WebTopicAnalyzer:
         try:
             #step 1: get text content and title
             title, content = content_extraction.get_text(self.__url);
-            print(content);
+            #print(content);
             gen_docs = [w.lower() for w in word_tokenize(content)] 
             token_relevance = k_means_grouper.get_relevance(gen_docs);
             #step 2: Get all title, h1, meta tags of the web page.
             title_content, meta_content, h1_tag_content = html_parser.parse_html(self.__url);
-            print("Title content : ", title_content);
-            print("Meta Content : ", meta_content);
-            print("H1 Tag content : ", h1_tag_content);
+            #print("Title content : ", title_content);
+            #print("Meta Content : ", meta_content);
+            #print("H1 Tag content : ", h1_tag_content);
             #step 3: get noun words and phrases (from wiki search)
             nouns = noun_extractor.get_nouns(title, content);
             #step 4: ranking - giving scores to each word based on several factors.
@@ -62,11 +62,14 @@ class WebTopicAnalyzer:
                 sum = 0;
                 for each_k in k.getword().split():
                     print("each_k ", each_k);
+                    count_tokens = 0;
                     if each_k in token_relevance:
                         print('Token relevance ', token_relevance[each_k]);
                         sum += token_relevance[each_k];
                         print("sum ", sum)
-                sum = sum/len(k.getword().split());
+                        count_tokens += 1;
+                if count_tokens != 0:
+                    sum = sum/count_tokens;
                 k.score += sum;
                 print("word ", k.getword(), " ", k.getscore())
             print("------------TOP 15--------------")

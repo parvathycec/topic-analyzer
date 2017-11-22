@@ -1,4 +1,3 @@
-#coding: utf8
 '''
 @summary: Step 2 of the algorithm:
 Extracts nouns from the content of the article and get related
@@ -16,7 +15,10 @@ import spacy
 import wikipedia
 from ranked_word import RankedWord
 from time import sleep
+from itertools import combinations
+import copy
 
+nlp = spacy.load('en');
 
 def get_nouns(title, content):
     """Get all noun chunks from the text extracted from website
@@ -30,20 +32,36 @@ def get_nouns(title, content):
     wiki_results = {};
     for noun in dict_nouns.values():
         print("Noun Candidate : ", noun)
-        wiki_phrase = search_wiki(noun, article_content, dict_nouns);
-        if wiki_phrase is not None:
-            wiki_results[wiki_phrase] = RankedWord(wiki_phrase, noun.isPos);
-        
+        if noun.isPos:
+            wiki_phrase = search_wiki(noun, article_content, dict_nouns);
+            if wiki_phrase is not None:
+                wiki_results[wiki_phrase.rstrip().lstrip()] = RankedWord(wiki_phrase.rstrip().lstrip(), noun.isPos);
+    noun_chunks = extract_title_nouns(title);
+    #To merge two dictionaries
+    #Reference: https://stackoverflow.com/questions/38987/how-to-merge-two-dictionaries-in-a-single-expression
+    wiki_results.update(noun_chunks);
     #Removing nouns already in wiki:
     remove_duplicates(dict_nouns, wiki_results);
+    wiki_results_copy = copy.deepcopy(wiki_results)
+    remove_duplicates(wiki_results, wiki_results_copy);
     
     return list(dict_nouns.values())+list(wiki_results.values());
+
+def extract_title_nouns(title):
+    noun_chunks = {};
+    doc_title = nlp(title.replace("'", ' '));
+    for chunk in list(doc_title.noun_chunks):
+        chunk = chunk.text.rstrip().lstrip().lower();
+        noun_chunk = RankedWord(chunk, False);
+        noun_chunks[chunk] = noun_chunk;
+    print("Noun Chunk ", list(doc_title.noun_chunks));
+    return noun_chunks;
+
 
 
 def extract_nouns(article_content):
     """Gets nouns in the article content using Spacy"""
     #load spacy for English
-    nlp = spacy.load('en');
     doc = nlp(article_content)
     dict_nouns = {};
     for token in doc:
@@ -57,14 +75,14 @@ def extract_nouns(article_content):
         #4)We don't want proper nouns who don't have a definite entity type.
         if (token.pos_ == 'PROPN' and len(token.text) > 2 and token.ent_type_ != "") or \
         (token.pos_ == 'NOUN' and token.tag_ != 'WP' and len(token.text) > 3):
-            if(token.ent_type_ != 'DATE'):
-                wr = RankedWord(token.text.lower(), (token.pos_ == 'PROPN'))
+            if(token.ent_type_ != 'DATE' and token.ent_type_ != 'TIME'):
+                wr = RankedWord(token.text.rstrip().lstrip().lower(), (token.pos_ == 'PROPN'))
                 if (wr.getword() not in dict_nouns):
                     dict_nouns [wr.getword()] = wr;
-            elif token.text.lower() in dict_nouns:
-                del dict_nouns[token.text.lower()];
-        elif token.text.lower() in dict_nouns:
-            del dict_nouns[token.text.lower()];#remove if it is not a noun in another context
+            elif token.text.rstrip().lstrip().lower() in dict_nouns:
+                del dict_nouns[token.text.rstrip().lstrip().lower()];
+        elif token.text.rstrip().lstrip().lower() in dict_nouns:
+            del dict_nouns[token.text.rstrip().lstrip().lower()];#remove if it is not a noun in another context
     return dict_nouns;
 
 
@@ -100,10 +118,10 @@ def search_wiki(noun, article_content, dict_nouns):
             elif (',' in wiki_topic) and any(t in article_content.lower() for t in wiki_topic.lower().split(",")):
                 phrases = wiki_topic.lower().split(",");
                 for phrase in phrases:
-                    if phrase in article_content.lower():
+                    if phrase.lstrip().rstrip() in article_content.lower().split():
                         print(phrase, " ", all(t in dict_nouns.keys() for t in phrase.split()));
                         for ph in phrase.split():
-                            if ph in dict_nouns and dict_nouns[ph].isPos:
+                            if ph in dict_nouns and dict_nouns[ph].isPos and (len(ph.split()) > 1):
                                 return phrase.lstrip().rstrip();
                     
         
@@ -112,7 +130,15 @@ def search_wiki(noun, article_content, dict_nouns):
 def remove_duplicates(dict_nouns, wiki_results):
     """Remove nouns which are added as wiki phrases"""
     for wiki_val in wiki_results.keys():
-        for val in wiki_val.split():
-            for nn in list(dict_nouns):
-                if val == nn:
-                    del dict_nouns[nn];
+        arr = wiki_val.split();
+        for i in range(0,len(arr)):
+            wiki_val_arr = wiki_val.split()[i:len(arr)];
+            for i in range(1, len(wiki_val_arr)+1):
+                iter_k = combinations(wiki_val_arr, i)
+                curr_combination = ' '.join(iter_k.__next__());
+                print("curr_combination ", curr_combination);
+                for nn in list(dict_nouns):
+                    print("nn ", nn);
+                    if curr_combination.rstrip().lstrip() == nn.rstrip().lstrip() and (curr_combination.rstrip().lstrip() != wiki_val.rstrip().lstrip()):
+                        print("Deleting")
+                        del dict_nouns[nn.rstrip().lstrip()];
