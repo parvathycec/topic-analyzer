@@ -1,8 +1,12 @@
-#Step 4: To remove keywords that are similar
-#This is to bring more diversity to the top ranked keywords
-#We use an algorithm called k-means for this.
-#The K-means algorithm is implemented using numpy arrays for computation
-#We use GoogleNews pre-trained dataset to compute word2vec.
+'''
+@summary: Step 4: To remove keywords that are similar
+This is to bring more diversity to the top ranked keywords
+We use an algorithm called k-means for this.
+The K-means algorithm is implemented using numpy arrays for computation
+We use GoogleNews pre-trained dataset to compute word2vec.
+@author: Parvathy
+'''
+
 from math import sqrt
 import os
 import random
@@ -10,7 +14,6 @@ from gensim import models
 from gensim.models.keyedvectors import KeyedVectors
 from numpy import float32
 import numpy as np
-
 
 MODEL_PATH = 'C:/Users/parvathy/Documents/UNH/Fall 2017/Python/Project/data.model/GoogleNews-vectors-negative300.bin'
 
@@ -151,6 +154,7 @@ def get_clusters(ranked_words):
 
 
 def get_ranked_word(ranked_word_list, word):
+    """Get RankedWord object containing the given word"""
     for rw in ranked_word_list:
         if word == rw.getword():
             return rw;

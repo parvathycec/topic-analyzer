@@ -2,7 +2,8 @@
 '''
 @summary: Step 1 of the algorithm: Extracts content of the article 
 using third party library newspaper article.
-@author: Parvathy'''
+@author: Parvathy
+'''
 
 from newspaper import Article
 from newspaper.article import ArticleException
