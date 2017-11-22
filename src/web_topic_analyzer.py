@@ -1,7 +1,10 @@
-#Controller class which calls all functions to 
-#execute steps of the algorithm
-#This class object is called from project_ui.py to
-#run the analyzer for the given input.
+"""
+@summary: Controller class which calls all functions to 
+execute steps of the algorithm
+This class object is called from project_ui.py to
+run the analyzer for the given input.
+@author: Parvathy
+"""
 import content_extraction, html_parser
 import noun_extractor
 import k_means_grouper
