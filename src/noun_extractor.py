@@ -1,7 +1,6 @@
 #coding: utf8
 '''
-@author: Parvathy
-@see: Step 2 of the algorithm:
+@summary: Step 2 of the algorithm:
 Extracts nouns from the content of the article and get related
 keywords from wikipedia.
 Uses third party libraries Spacy and wikipedia.
@@ -9,7 +8,8 @@ Spacy identifies nouns from the content,
 For each identified noun word, we do a search in wikipedia to 
 get 20 search results.
 If any of the search result is in article content, that phrase is 
-taken as a potential keyword along with the noun. 
+taken as a potential keyword along with the noun.
+@author: Parvathy 
 '''
 
 import spacy
