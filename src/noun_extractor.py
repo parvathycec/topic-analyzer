@@ -30,7 +30,7 @@ def get_nouns(title, content):
     wiki_results = {};
     for noun in dict_nouns.values():
         print("Noun Candidate : ", noun)
-        wiki_phrase = search_wiki(noun);
+        wiki_phrase = search_wiki(noun, article_content, dict_nouns);
         if wiki_phrase is not None:
             wiki_results[wiki_phrase] = RankedWord(wiki_phrase, noun.isPos);
         
@@ -68,41 +68,43 @@ def extract_nouns(article_content):
     return dict_nouns;
 
 
-def search_wiki(noun, article_content):
+def search_wiki(noun, article_content, dict_nouns):
     """Search wikipedia for articles with noun keyword in title"""
     try:
         wiki_result = wikipedia.search(noun.getword(), results=20);
-    except:#sometimes, connection is refused because our application exceeds maximum trys.
+    except Exception as e:#sometimes, connection is refused because our application exceeds maximum trys.
         #So sleep for 5 seconds before doing next search.
         sleep(5);
+        print(e);
         return None;
-    #print("Wiki : ", wiki_result);
-    for wiki_topic in wiki_result:
-        wiki_topic = wiki_topic.lower();
-       # print("wiki_topic ", wiki_topic);
-        topics = wiki_topic.split();
-        #for easier comparison, converting to lower case
-        #We need only phrases here, don't need words as it would be duplicate
-        #Checking if the phrase is in the web content.
-        #Ex: We will have words Statue and Liberty in noun array, 
-        #Wiki results will get the phrase Statue of Liberty and if it is in web page, 
-        #this phrase is a potential candidate
-        #https://en.wikipedia.org/wiki/Wikipedia:Article_titles#Deciding_on_an_article_title
-        if len(topics) > 1  and (wiki_topic.lower() in article_content.lower() or wiki_topic.lower()+" " in article_content.lower()):
-            if (wiki_topic == noun.getword()):#avoid duplicates
-                continue;
-            #Dont want cases like "The Case" where we get a result as "The <existing_noun_candidate"
-            if(len(topics) == 2 and topics[0] == "the"):
-                continue;
-            return wiki_topic.lower().rstrip().lstrip();
-        elif (',' in wiki_topic) and any(t in article_content.lower() for t in wiki_topic.lower().split(",")):
-            phrases = wiki_topic.lower().split(",");
-            for phrase in phrases:
-                if phrase in article_content.lower():
-                    print(phrase, " ", all(t in dict_nouns.keys() for t in phrase.split()));
-                    for ph in phrase.split():
-                        if ph in dict_nouns and dict_nouns[ph].isPos:
-                            return phrase.lstrip().rstrip();
+    else:
+        #print("Wiki : ", wiki_result);
+        for wiki_topic in wiki_result:
+            wiki_topic = wiki_topic.lower();
+           # print("wiki_topic ", wiki_topic);
+            topics = wiki_topic.split();
+            #for easier comparison, converting to lower case
+            #We need only phrases here, don't need words as it would be duplicate
+            #Checking if the phrase is in the web content.
+            #Ex: We will have words Statue and Liberty in noun array, 
+            #Wiki results will get the phrase Statue of Liberty and if it is in web page, 
+            #this phrase is a potential candidate
+            #https://en.wikipedia.org/wiki/Wikipedia:Article_titles#Deciding_on_an_article_title
+            if len(topics) > 1  and (wiki_topic.lower() in article_content.lower() or wiki_topic.lower()+" " in article_content.lower()):
+                if (wiki_topic == noun.getword()):#avoid duplicates
+                    return None;
+                #Dont want cases like "The Case" where we get a result as "The <existing_noun_candidate"
+                if(len(topics) == 2 and topics[0] == "the"):
+                    return None;
+                return wiki_topic.lower().rstrip().lstrip();
+            elif (',' in wiki_topic) and any(t in article_content.lower() for t in wiki_topic.lower().split(",")):
+                phrases = wiki_topic.lower().split(",");
+                for phrase in phrases:
+                    if phrase in article_content.lower():
+                        print(phrase, " ", all(t in dict_nouns.keys() for t in phrase.split()));
+                        for ph in phrase.split():
+                            if ph in dict_nouns and dict_nouns[ph].isPos:
+                                return phrase.lstrip().rstrip();
                     
         
                             
