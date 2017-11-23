@@ -4,7 +4,6 @@ This is to bring more diversity to the top ranked keywords
 We use an algorithm called k-means for this.
 The K-means algorithm is implemented using numpy arrays for computation
 We use GoogleNews pre-trained dataset to compute word2vec.
-MODEL_PATH should point to the dataset location. Tested only in Windows.
 @author: Parvathy
 '''
 
@@ -16,8 +15,11 @@ from gensim.corpora import TextCorpus, MmCorpus, Dictionary
 from gensim.models.keyedvectors import KeyedVectors
 from numpy import float32
 import numpy as np
+from os import path
 
-MODEL_PATH = 'C:/Users/parvathy/Documents/UNH/Fall 2017/Python/Project/data.model/GoogleNews-vectors-negative300.bin'
+#MODEL_PATH = 'C:/Users/parvathy/Documents/UNH/Fall 2017/Python/Project/data.model/GoogleNews-vectors-negative300.bin'
+#MODEL_FILENAME = 'GoogleNews-vectors-negative300.bin';
+    
 
 def euclidian_distance(vector1, vector2):
     """Find euclidian distance between two vectors"""
@@ -83,9 +85,10 @@ def get_centroid(centroid_list, X):
         
 def get_clusters(ranked_words):
 
-    model = models.KeyedVectors.load_word2vec_format(os.path.join(os.path.dirname(__file__), MODEL_PATH), binary=True, limit=50000)
-    model.init_sims(replace=True)
-    model.save('GoogleNews-vectors-gensim-normed.bin');
+    model = KeyedVectors.load('GoogleNews-vectors-gensim-normed.bin', mmap='r')
+    model.syn0norm = model.syn0  # prevent recalc of normed vectors
+   # model.init_sims(replace=True)
+   # model.save('GoogleNews-vectors-gensim-normed.bin');
     word2vec_dict = {}
     #words = model.wv.index2word  # order from model.wv.syn0
     final_words = [];
@@ -137,8 +140,8 @@ def get_clusters(ranked_words):
     #print(sum_distance);
     sum_distance_arr.append(sum_distance);
     dt=np.dtype('float32')
-    model = KeyedVectors.load('GoogleNews-vectors-gensim-normed.bin', mmap='r')
-    model.syn0norm = model.syn0  # prevent recalc of normed vectors
+    #model = KeyedVectors.load('GoogleNews-vectors-gensim-normed.bin', mmap='r')
+    #model.syn0norm = model.syn0  # prevent recalc of normed vectors
     centroid_words = [];
     centroid_data_list = [];
     counter = 0;

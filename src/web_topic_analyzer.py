@@ -19,7 +19,7 @@ class WebTopicAnalyzer:
         self.__url = url;
     
     def process(self):   
-        try:
+        #try:
             #step 1: get text content and title
             print("INFO: Getting the text content of web page.");
             title, content = content_extraction.get_text(self.__url);
@@ -85,9 +85,9 @@ class WebTopicAnalyzer:
                         key_words.append(rw.getword().title());
             print("INFO: Success, check your words in the UI.");
             return {'words' : key_words};
-        except Exception as e:
-            print("ERROR: Some error occurred.");
-            print(e);
-            return {"error": "Sorry, something went wrong! Please verify the URL."};
-        else:
-            return {"words" : key_words};
+        #except Exception as e:
+        #    print("ERROR: Some error occurred.");
+        #    print(e);
+        #    return {"error": "Sorry, something went wrong! Please verify the URL."};
+        #else:
+        #    return {"words" : key_words};
