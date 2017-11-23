@@ -8,7 +8,7 @@ a) BeautifulSoap4
 Library: BeautifulSoap4
 Reference : http://www.pythonforbeginners.com/python-on-the-web/web-scraping-with-beautifulsoup/
 commands:
-pip install beautifulsoup4 
+python -m pip install beautifulsoup4 
 
 
 b) Content Extraction: 
