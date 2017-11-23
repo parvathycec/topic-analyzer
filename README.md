@@ -1,7 +1,7 @@
 # topic-analyzer
 Group Project by Parvathy Mohan and Saranya Balaji for Python course
 Dependency:
-python -m nltk.downloader all
+python -m nltk.downloader punkt
 
 1. Step 1: Html Parsing:
 a) BeautifulSoap4
