@@ -76,7 +76,7 @@ def get_centroid(centroid_list, X):
     centroid_list = [np.mean(arr, axis=0, dtype=float32) for arr in centroid_map.values()]
     #print("centroid_list : ", centroid_list)
     if (np.array_equal(old_centroid_list, centroid_list)): 
-        print("Finally no more change");
+        #print("Finally no more change");
         return centroid_map;
     return get_centroid(centroid_list, X);
         
@@ -111,30 +111,30 @@ def get_clusters(ranked_words):
    # K=range(10);#round(sqrt(len(X)/2));#randomly choose k elements
     sum_distance_arr = [];
     for k in range(1, 10):
-        print("*******************", k)
+        #print("*******************", k)
         centroid_list = random.sample(X, k);
         final_centroid_map = get_centroid(centroid_list, X);
         sum_distance = 0;
         for centroid_key in final_centroid_map.keys():
             for data_value in final_centroid_map[centroid_key]:
                sum_distance += euclidian_distance(centroid_key, data_value)
-        print(sum_distance);
+        #print(sum_distance);
         sum_distance_arr.append(sum_distance);
         if(sum_distance == 0):
             break;
     k = 1;
     if len(sum_distance_arr) > 1:
         list_val = [abs(t - s) for s, t in zip(sum_distance_arr, sum_distance_arr[1:])];
-        print(list_val);
+        #print(list_val);
         k = list_val.index(min(list_val))+1;
-    print("Final *******************", k)
+    #print("Final *******************", k)
     centroid_list = random.sample(X, k);
     final_centroid_map = get_centroid(centroid_list, X);
     sum_distance = 0;
     for centroid_key in final_centroid_map.keys():
         for data_value in final_centroid_map[centroid_key]:
            sum_distance += euclidian_distance(centroid_key, data_value)
-    print(sum_distance);
+    #print(sum_distance);
     sum_distance_arr.append(sum_distance);
     dt=np.dtype('float32')
     model = KeyedVectors.load('GoogleNews-vectors-gensim-normed.bin', mmap='r')
@@ -146,7 +146,7 @@ def get_clusters(ranked_words):
     for word_vec in final_centroid_map.keys():
         counter += 1;
         centroid_word, centroid_vector = model.most_similar(positive=[np.array(tuple(word_vec),dtype=dt)], topn=1)[0];
-        print("Centroid : ", centroid_word);
+        #print("Centroid : ", centroid_word);
         centroid_data_list.append(np.column_stack(([np.array(tuple(word_vec),dtype=dt)])))
         centroid_words.append(centroid_word);
         data_clusters = [];
@@ -165,7 +165,7 @@ def get_ranked_word(ranked_word_list, word):
         
 def get_relevance(words):
     texts = [[word for word in rw.lower().split()] for rw in words]
-    print(texts)
+    #print(texts)
     dictionary = corpora.Dictionary(texts)
     corpus = [dictionary.doc2bow(text) for text in texts]
 
@@ -175,8 +175,8 @@ def get_relevance(words):
     for doc in corpus_tfidf:
         for id, value in doc:
             word = dictionary.get(id)
-            print('Word : ', word)
-            print('Value : ',value)
+            #print('Word : ', word)
+            #print('Value : ',value)
             d[word] = value;
     #sorted(d, key=lambda k: d[k][1])
     return d;
