@@ -1,14 +1,14 @@
 # topic-analyzer
 Group Project by Parvathy Mohan and Saranya Balaji for Python course
 Dependency:
-python -m nltk.downloader all
+python -m nltk.downloader punkt
 
 1. Step 1: Html Parsing:
 a) BeautifulSoap4
 Library: BeautifulSoap4
 Reference : http://www.pythonforbeginners.com/python-on-the-web/web-scraping-with-beautifulsoup/
 commands:
-pip install beautifulsoup4 
+python -m pip install beautifulsoup4 
 
 
 b) Content Extraction: 
@@ -19,6 +19,9 @@ python -m pip install newspaper3k
 
 2. Noun Chunker:
 Library: Spacy, Wikipedia
+For spacy, in windows, make sure that there Visual C++ 14 build tools installed.
+If not, install from here http://landinghub.visualstudio.com/visual-cpp-build-tools
+
 Commands:
 python -m pip install -U spacy
 python -m spacy download en
