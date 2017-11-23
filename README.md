@@ -19,6 +19,9 @@ python -m pip install newspaper3k
 
 2. Noun Chunker:
 Library: Spacy, Wikipedia
+For spacy, in windows, make sure that there Visual C++ 14 build tools installed.
+If not, install from here http://landinghub.visualstudio.com/visual-cpp-build-tools
+
 Commands:
 python -m pip install -U spacy
 python -m spacy download en
