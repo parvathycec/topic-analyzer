@@ -15,7 +15,7 @@ Commands to install libraries (tested in Windows 10):
 python -m pip install beautifulsoup4
 python -m pip install newspaper3k
 python -m pip install -U spacy
-python -m spacy download en_core_web_sm
+python -m spacy download en
 (It is okay if an error for shortcut link appears).
 python -m pip install wikipedia
 python -m pip install numpy

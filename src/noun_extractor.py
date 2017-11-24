@@ -22,7 +22,7 @@ from ranked_word import RankedWord
 from newspaper import article
 
 #Load spacy English dataset
-nlp = spacy.load('en_core_web_sm');
+nlp = spacy.load('en');
 
 def get_nouns(title, content):
     """Get all noun chunks from the text extracted from website
