@@ -4,6 +4,7 @@ import tkinter.ttk as ttk
 from web_topic_analyzer import WebTopicAnalyzer
 import datetime
 import threading
+import time
 
 actual_url = ""
 #import words
@@ -16,7 +17,7 @@ class project_GUI:
     def __init__(self,master):
         self.master = master
         self.master.title("Web Page Token Analyzer")
-        self.master.geometry("1000x1000+0+0")
+        #self.master.geometry("2000x2000+0+0")
 
         #frames
 
@@ -49,6 +50,11 @@ class project_GUI:
         self.title_label.config(font = ("Calibri", 40))
         self.title_label.pack()
 
+        #label for loading message
+
+        self.loading_text = tkinter.Label(self.frame_progress_bar, bd = 4, font = "Calibri", fg = "brown" , anchor = "center", height = 2)
+        
+        
         #label for user text
 
         self.enter_url_label = tkinter.Label(self.frame_url,text = "Enter the URL     ")
@@ -90,8 +96,7 @@ class project_GUI:
     def check_url(self,url):
         try:
             request = requests.get(url)
-            if request.status_code == 200:
-                
+            if request.status_code == 200 and ("text/html" in request.headers["content-type"]):  
                 return True
             else:
                 return False
@@ -99,7 +104,9 @@ class project_GUI:
         except:
             return False
 
-
+    def pack_loading(self):
+        self.loading_text.config(text = "Loading...")
+        self.loading_text.pack()
         
     def on_reset(self):
         self.enter_user_url_label.delete(0,'end')
@@ -111,54 +118,53 @@ class project_GUI:
     def no_url(self):
         tkinter.messagebox.showerror("Error","Website does not exist or it is forbidden, Please check it!")
 
-    def actual_extract(self,actual_url):
-       a = datetime.datetime.now()
-       analyzer = WebTopicAnalyzer(actual_url);
-       process_result = analyzer.process();
-       if 'error' in process_result:
-        tkinter.messagebox.showerror("Error",process_result['error']);
-       elif 'words' in process_result:
-        tokens = process_result['words'];
-        self.label_op1.config(text = "Tokens for the webpage", height = 3, anchor = "center", fg = "brown" , font = ("calibri",20))
-        self.label_op1.pack(side = "top")
-        
-        for label_index in range(len(tokens)):
-            if label_index < 5:
-                self.labels[label_index].config(text = str(tokens[label_index]))
-                self.labels[label_index].pack(fill= "x",side = "left")
-            elif label_index >= 5 and label_index < 10:
-                self.labels[label_index].config(text = str(tokens[label_index]))
-                self.labels[label_index].pack(fill= "x",side = "left")
-            else:
-                self.labels[label_index].config(text = str(tokens[label_index]))
-                self.labels[label_index].pack(fill= "x",side = "left")
-    
-        b = datetime.datetime.now()
-        c = b - a
-        print("Total time taken : ", c.seconds, " seconds")
        
         
     def on_extract(self):
         #pack the label
         #please_wait_label.pack_forget()
         actual_url = self.current_url.get()
-
+        self.master.after(0,pack_loading)
 
         if self.check_url(actual_url) == True:
-           t = threading.Thread(target = self.actual_extract(actual_url))
-           t.start()
-           while (t.is_alive()):
-               sleep(0.5)
-               self.update()
-               
+           
+           a = datetime.datetime.now()
+           analyzer = WebTopicAnalyzer(actual_url);
+           process_result = analyzer.process();
+           if 'error' in process_result:
+            tkinter.messagebox.showerror("Error",process_result['error']);
+           elif 'words' in process_result:
+            tokens = process_result['words'];
+            self.label_op1.config(text = "Tokens for the webpage", height = 3, anchor = "center", fg = "brown" , font = ("calibri",20))
+            self.label_op1.pack(side = "top")
+            
+            for label_index in range(len(tokens)):
+                if label_index < 5:
+                    self.labels[label_index].config(text = str(tokens[label_index]))
+                    self.labels[label_index].pack(fill= "x",side = "left")
+                elif label_index >= 5 and label_index < 10:
+                    self.labels[label_index].config(text = str(tokens[label_index]))
+                    self.labels[label_index].pack(fill= "x",side = "left")
+                else:
+                    self.labels[label_index].config(text = str(tokens[label_index]))
+                    self.labels[label_index].pack(fill= "x",side = "left")
+
+            self.loading_text.pack_forget()
+        
+            b = datetime.datetime.now()
+            c = b - a
+            print("Total time taken : ", c.seconds, " seconds")
            
           
             
         else:
             self.no_url()
+            self.loading_text.pack_forget()
+            
    
 
 master = tkinter.Tk()
+master.state('zoomed')
 p = project_GUI(master)
 
 master.mainloop()
