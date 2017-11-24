@@ -1,23 +1,102 @@
 '''
-@summary: Step 4: To remove keywords that are similar
-This is to bring more diversity to the top ranked keywords
-We use an algorithm called k-means for this.
-The K-means algorithm is implemented using numpy arrays for computation
-We use GoogleNews pre-trained dataset to compute word2vec.
-@author: Parvathy
+@summary: To remove keywords that are similar.
+This is to bring more diversity to the top ranked keywords.
+We use an algorithm called K-means for grouping.
+Each word in the keyword list is converted to a vector using word2vec.
+We use GoogleNews pre-trained dataset to get vector of word.
+Then, we divide the n keywords into k clusters.
+Initially, we randomly choose k centroids.
+The euclidian distance of each vector is calculated from the centroid.
+Each cluster is formed with a centroid and vectors which are closest to it.
+Once cluster is formed, a new centroid is found for each cluster.
+Based on the distance, new clusters are formed.
+This process is continued until, the list of centroid stop changing. 
+This is the final list of clusters.
+Only one keyword from each cluster will be taken as final keyword.
+@author: Parvathy Mohan
 '''
-
 from math import sqrt
-import os
 import random
-from gensim import corpora, models, similarities
-from gensim.corpora import TextCorpus, MmCorpus, Dictionary
+from gensim import models
 from gensim.models.keyedvectors import KeyedVectors
 from numpy import float32
 import numpy as np
-from os import path
     
 
+def get_clusters(ranked_words):
+    """Group the words to K clusters based on similarity between the words (word2vec)"""
+    if(len(ranked_words) < 15):
+        #Cannot group too small data set, return as it is
+        return ranked_words, [];
+    #Loading pre-trained smaller dataset of GoogleNews
+    model = KeyedVectors.load('GoogleNews-vectors-gensim-normed.bin', mmap='r')
+    
+    #Word and vector mapping 
+    word2vec_dict = {}#Key is the word and value is the vector
+    #List of words which don't have a vector representation in data set
+    no_vector_words = [];
+    #list of vectors
+    X = [];
+    #For each word
+    for rw in ranked_words:
+        #If the word has a vector representation in the data set
+        if rw.getword() in model.wv.vocab:
+            word2vec_dict[rw.getword()] = model.wv[rw.getword()]
+            X.append(word2vec_dict[rw.getword()].T);
+        else:
+            no_vector_words.append(rw);
+    
+    #pick K random points as cluster,
+    #To computer best K, we try K as 1 to 10 and find the best K
+    sum_distance_arr = [];
+    for k in range(1, 10):
+        #Randomly find K centroid vectors
+        centroid_list = random.sample(X, k);
+        final_centroid_map = get_centroid(centroid_list, X);
+        sum_distance = 0;
+        for centroid_key in final_centroid_map.keys():
+            for data_value in final_centroid_map[centroid_key]:
+                #Sum of the euclidian distance between each vector and cluster
+                #is calculated and kept in an array
+               sum_distance += euclidian_distance(centroid_key, data_value)
+        sum_distance_arr.append(sum_distance);
+        if(sum_distance == 0):
+            break;
+    k = 1;#By default, if any break happens in the previous loop
+    if len(sum_distance_arr) > 1:
+        #We are comparing the change between each sum and the minimum changed step is taken as K
+        list_val = [abs(t - s) for s, t in zip(sum_distance_arr, sum_distance_arr[1:])];
+        k = list_val.index(min(list_val))+1;
+    print("Value of k is ", k);
+    #Now we got k, we have to get cluster based on it.
+    centroid_list = random.sample(X, k);
+    final_centroid_map = get_centroid(centroid_list, X);
+    dt=np.dtype('float32')
+    counter = 0;
+    data_cluster_list = [];
+    #Converting cluster vectors to cluster words
+    for word_vec in final_centroid_map.keys():
+        counter += 1;
+        #Getting corresponding word from data set based on the vector.
+        centroid_word, centroid_vector = model.most_similar(positive=[np.array(tuple(word_vec),dtype=dt)], topn=1)[0];
+        print("centroid : ", centroid_word)
+        data_clusters = [];
+        for val_vec in final_centroid_map[word_vec]:
+            data_word, data_vector = model.most_similar(positive=[np.array(tuple(val_vec),dtype=dt)], topn=1)[0];
+            print("cluster : ", data_word)
+            data_clusters.append(get_ranked_word(ranked_words, data_word));
+        data_cluster_list.append(data_clusters);
+    #Returning those keywords which did not have vectors
+    #and data clusters (so that highly ranked word from each cluster would be taken later)
+    return no_vector_words, data_cluster_list;
+
+
+def get_ranked_word(ranked_word_list, word):
+    """Get RankedWord object containing the given word"""
+    for rw in ranked_word_list:
+        if word == rw.getword():
+            return rw;
+        
 def euclidian_distance(vector1, vector2):
     """Find euclidian distance between two vectors"""
     #Reference: http://www.codehamster.com/2015/03/09/different-ways-to-calculate-the-euclidean-distance-in-python/
@@ -30,9 +109,7 @@ def euclidian_distance(vector1, vector2):
     return euclidean_distance;
    
 def find_closest_centroid(centroid_vector_distance_map):
-    """Find the shortest euclidian distance 
-    input: {centroid:euclidian distance of the vector to this centroid
-    output: centroid with the shortest distance"""
+    """Find the centroid vector which is closest to a vector"""
     shortest_dist = 0;
     closest_centroid = 0;
     count = 0;
@@ -46,10 +123,10 @@ def find_closest_centroid(centroid_vector_distance_map):
     return closest_centroid;
 
 
-def find_distance(centroid_map, word_vectors):
-    """Find the closest centroid for each word_vector"""
-    #TODO: 0
+def rearrange_cluster(centroid_map, word_vectors):
+    """Rearrange the clusters based on the closest centroid to each vector"""
     centroid_vector_distance_map = {k:0 for k in centroid_map.keys()};
+    #For each vector, getting the closest centroid and hence rearranging the cluster.
     for word_vector in word_vectors:
         for centroid in centroid_map.keys():
             #calculate distance of current vec from each centroid
@@ -65,122 +142,18 @@ def get_centroid(centroid_list, X):
     """Get centroids recursively until no more changes are needed"""
     #We use Euclidean distance here
     #This is a map of centroid and list of vectors
-    #key is current centroid and list of vectors is the value
-    centroid_map = {tuple(k):[] for k in centroid_list};#converting to tuple because key cannot be an array
-    centroid_map = find_distance(centroid_map, X);
-    #print("After clustering : ", centroid_map);
-    #step 3: find average of each cluster and assign it as new centroid
+    #key is current centroid and list of vectors is the values
+    # in that cluster belonging to centroid
+    #converting to tuple because key cannot be an array
+    centroid_map = {tuple(k):[] for k in centroid_list};
+    #Find average of each cluster and assign it as new centroid
     old_centroid_list = centroid_list;
-    #print("old_centroid_list : ", old_centroid_list);
+    centroid_map = rearrange_cluster(centroid_map, X);
     centroid_list = [np.mean(arr, axis=0, dtype=float32) for arr in centroid_map.values()]
-    #print("centroid_list : ", centroid_list)
     if (np.array_equal(old_centroid_list, centroid_list)): 
-        #print("Finally no more change");
         return centroid_map;
+    #Calling it recursively, until there is no more change between old 
+    #centroid list and new centroid list
     return get_centroid(centroid_list, X);
         
         
-def get_clusters(ranked_words):
-
-    #model = models.KeyedVectors.load_word2vec_format(os.path.join(os.path.dirname(__file__), MODEL_PATH), binary=True, limit=20000)
-    #model.init_sims(replace=True)
-    #model.save('GoogleNews-vectors-gensim-normed.bin');
-    model = KeyedVectors.load('GoogleNews-vectors-gensim-normed.bin', mmap='r')
-    #model.syn0norm = model.syn0  # prevent recalc of normed vectors
-   # model.init_sims(replace=True)
-   # model.save('GoogleNews-vectors-gensim-normed.bin');
-    word2vec_dict = {}
-    #words = model.wv.index2word  # order from model.wv.syn0
-    final_words = [];
-    words = [];
-    
-    for i in ranked_words:
-        if i.getword() in model.wv.vocab:
-            word2vec_dict[i.getword()] = model.wv[i.getword()]
-            #print('vector : ', word2vec_dict[i].T );
-        #print("word2vec_dict[i] is ", word2vec_dict[i])
-    #list of vectors
-    X = [];
-    words = [];
-    for i in ranked_words:
-        if i.getword() in word2vec_dict:
-            X.append(word2vec_dict[i.getword()].T);
-            words.append(i.getword());
-        else:
-            final_words.append(i);#Can use numpy array
-    
-    #step 1: pick K random points as cluster
-    #print(X);
-   # K=range(10);#round(sqrt(len(X)/2));#randomly choose k elements
-    sum_distance_arr = [];
-    for k in range(1, 10):
-        #print("*******************", k)
-        centroid_list = random.sample(X, k);
-        final_centroid_map = get_centroid(centroid_list, X);
-        sum_distance = 0;
-        for centroid_key in final_centroid_map.keys():
-            for data_value in final_centroid_map[centroid_key]:
-               sum_distance += euclidian_distance(centroid_key, data_value)
-        #print(sum_distance);
-        sum_distance_arr.append(sum_distance);
-        if(sum_distance == 0):
-            break;
-    k = 1;
-    if len(sum_distance_arr) > 1:
-        list_val = [abs(t - s) for s, t in zip(sum_distance_arr, sum_distance_arr[1:])];
-        #print(list_val);
-        k = list_val.index(min(list_val))+1;
-    #print("Final *******************", k)
-    centroid_list = random.sample(X, k);
-    final_centroid_map = get_centroid(centroid_list, X);
-    sum_distance = 0;
-    for centroid_key in final_centroid_map.keys():
-        for data_value in final_centroid_map[centroid_key]:
-           sum_distance += euclidian_distance(centroid_key, data_value)
-    #print(sum_distance);
-    sum_distance_arr.append(sum_distance);
-    dt=np.dtype('float32')
-    #model = KeyedVectors.load('GoogleNews-vectors-gensim-normed.bin', mmap='r')
-    #model.syn0norm = model.syn0  # prevent recalc of normed vectors
-    centroid_words = [];
-    centroid_data_list = [];
-    counter = 0;
-    data_cluster_list = [];
-    for word_vec in final_centroid_map.keys():
-        counter += 1;
-        centroid_word, centroid_vector = model.most_similar(positive=[np.array(tuple(word_vec),dtype=dt)], topn=1)[0];
-        #print("Centroid : ", centroid_word);
-        centroid_data_list.append(np.column_stack(([np.array(tuple(word_vec),dtype=dt)])))
-        centroid_words.append(centroid_word);
-        data_clusters = [];
-        for val_vec in final_centroid_map[word_vec]:
-            data_word, data_vector = model.most_similar(positive=[np.array(tuple(val_vec),dtype=dt)], topn=1)[0];
-            data_clusters.append(get_ranked_word(ranked_words, data_word));
-        data_cluster_list.append(data_clusters);
-    return final_words, data_cluster_list;
-
-
-def get_ranked_word(ranked_word_list, word):
-    """Get RankedWord object containing the given word"""
-    for rw in ranked_word_list:
-        if word == rw.getword():
-            return rw;
-        
-def get_relevance(words):
-    texts = [[word for word in rw.lower().split()] for rw in words]
-    #print(texts)
-    dictionary = corpora.Dictionary(texts)
-    corpus = [dictionary.doc2bow(text) for text in texts]
-
-    tfidf = models.TfidfModel(corpus)
-    corpus_tfidf = tfidf[corpus]
-    d = {}
-    for doc in corpus_tfidf:
-        for id, value in doc:
-            word = dictionary.get(id)
-            #print('Word : ', word)
-            #print('Value : ',value)
-            d[word] = value;
-    #sorted(d, key=lambda k: d[k][1])
-    return d;
-                
