@@ -1,4 +1,3 @@
-#coding: utf8
 '''
 @summary: Step 1 of the algorithm: Extracts content of the article 
 using third party library newspaper article.
