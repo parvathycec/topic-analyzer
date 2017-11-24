@@ -124,8 +124,8 @@ class project_GUI:
         #pack the label
         #please_wait_label.pack_forget()
         actual_url = self.current_url.get()
-        self.master.after(0,pack_loading)
-
+                
+        tkinter.messagebox.showinfo("Loading","This may take few seconds!!!Please wait!!!")
         if self.check_url(actual_url) == True:
            
            a = datetime.datetime.now()
