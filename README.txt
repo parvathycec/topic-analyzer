@@ -3,7 +3,7 @@ Python 3.6
 In Windows: Microsoft C++ 15 build tools
 Link: http://landinghub.visualstudio.com/visual-cpp-build-tools
 
-Third Party Libraries to be installed:
+Third Party Libraries to be installed (Commands below):
 1) BeautifulSoup
 2) Newspaper Article
 3) Numpy
