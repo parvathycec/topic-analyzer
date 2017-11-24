@@ -68,6 +68,8 @@ class project_GUI:
         self.enter_user_url_label = tkinter.Entry(self.frame_url,width=100,textvariable = self.current_url)
 
         self.enter_user_url_label.pack(side= "left")
+        self.enter_user_url_label.focus()
+        
 
         #button
 
@@ -85,11 +87,11 @@ class project_GUI:
         for i in range(15):
              label_text = "Label_" + str(i)
              if i < 5:
-                 label = tkinter.Label(self.frame_output_set_1, height = 3, justify = "center", anchor = "center",pady = 2,font = "Calibri", fg= "brown",wraplength = 250, relief = "ridge",width = 20, padx = 5)
+                 label = tkinter.Label(self.frame_output_set_1, height = 3, justify = "center", anchor = "center",pady = 2,font = ("Calibri",14), fg= "brown",wraplength = 250, relief = "ridge",width = 30, padx = 1)
              if i >=5 and i < 10:
-                 label = tkinter.Label(self.frame_output_set_2, height = 3 ,justify = "center",anchor = "center",pady = 2,font = "Calibri", fg = "brown",wraplength = 250 ,relief = "ridge",width = 20, padx = 5)
+                 label = tkinter.Label(self.frame_output_set_2, height = 3 ,justify = "center",anchor = "center",pady = 2,font = ("Calibri",14), fg = "brown",wraplength = 250 ,relief = "ridge",width = 30, padx = 1)
              if i >= 10:
-                 label = tkinter.Label(self.frame_output_set_3,height = 3, justify = "center",anchor = "center",pady = 2, font = "Calibri", fg = "brown",wraplength = 250, relief = "ridge",width = 20, padx = 5)
+                 label = tkinter.Label(self.frame_output_set_3,height = 3, justify = "center",anchor = "center",pady = 2, font = ("Calibri",14), fg = "brown",wraplength = 250, relief = "ridge",width = 30, padx = 1)
              self.labels.append(label)
 
 
@@ -125,7 +127,6 @@ class project_GUI:
         #please_wait_label.pack_forget()
         actual_url = self.current_url.get()
                 
-        tkinter.messagebox.showinfo("Loading","This may take few seconds!!!Please wait!!!")
         if self.check_url(actual_url) == True:
            
            a = datetime.datetime.now()
@@ -159,7 +160,7 @@ class project_GUI:
             
         else:
             self.no_url()
-            self.loading_text.pack_forget()
+            
             
    
 
