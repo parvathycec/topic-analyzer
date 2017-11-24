@@ -3,7 +3,7 @@
 execute steps of the algorithm
 This class object is called from project_ui.py to
 run the analyzer for the given input.
-@author: Parvathy
+@author: Parvathy Mohan
 """
 import content_extraction, html_parser
 import noun_extractor
@@ -30,6 +30,9 @@ class WebTopicAnalyzer:
             print("INFO: Extracting single word nouns from text content and searching related phrases from wikipedia articles.");
             print("INFO: This might take a few seconds.");
             nouns = noun_extractor.get_nouns(title, content);
+            is_input_small = False;
+            if(len(nouns) < 15):
+                is_input_small = True;
             #step 4: ranking - giving scores to each word based on several factors.
             print("INFO: Ranking words and phrases based on factors like occurrence, frequency etc.");
             ranked_words = [];
@@ -66,7 +69,10 @@ class WebTopicAnalyzer:
                     else:
                         key_words.append(rw.getword().title());
             print("INFO: Success, check your words in the UI.");
-            return {'words' : key_words};
+            if(count < 15):
+                return {'words' : key_words, "is_input_small" : is_input_small};
+            else:
+                return {'words' : key_words};
         except Exception as e:
             print("ERROR: Some error occurred.");
             print(e);

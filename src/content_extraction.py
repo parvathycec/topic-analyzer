@@ -1,7 +1,7 @@
 '''
-@summary: Step 1 of the algorithm: Extracts content of the article 
+@summary: Extracts content of the article 
 using third party library newspaper article.
-@author: Parvathy
+@author: Parvathy Mohan
 '''
 
 from newspaper import Article
