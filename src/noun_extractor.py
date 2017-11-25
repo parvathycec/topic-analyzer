@@ -1,20 +1,19 @@
 '''
-@summary: Step 2 of the algorithm:
+@summary:
 Extracts nouns from the content of the article and get related
 keywords from wikipedia.
 Uses third party libraries Spacy and wikipedia.
 Spacy identifies nouns from the content,
 For each identified noun word, we do a search in wikipedia to 
-get 20 search results.
+get 50 search results.
 If any of the search result is in article content, that phrase is 
 taken as a potential keyword along with the noun.
-@author: Parvathy 
+@author: Parvathy Mohan
 '''
 
 import copy
 from itertools import combinations
 from time import sleep
-
 import spacy
 import wikipedia
 
@@ -56,7 +55,9 @@ def get_nouns(title, content):
     
     return list(dict_nouns.values())+list(wiki_results.values());
 
+
 def extract_title_nouns(title, content):
+    """Extract nouns and pronouns from title"""
     noun_chunks = {};
     doc_title = nlp(title.replace("'", ' '));
     dict_nouns = {};
@@ -158,7 +159,7 @@ def search_wiki(noun, article_content, dict_nouns):
                             
 
 def remove_duplicates(dict_nouns, wiki_results, isSame=False):
-    """Remove nouns which are added as wiki phrases"""
+    """Remove duplicates"""
     for wiki_val in wiki_results.keys():
         arr = wiki_val.split();
         for i in range(0,len(arr)):
@@ -175,3 +176,6 @@ def remove_duplicates(dict_nouns, wiki_results, isSame=False):
                         else:
                             #print("Deleting")
                             del dict_nouns[nn.rstrip().lstrip()];
+                            
+if __name__ == '__main__':
+    print("This file can only be imported!")

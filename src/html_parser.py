@@ -2,20 +2,6 @@ import urllib.request
 import requests
 from bs4 import BeautifulSoup
 
-def htmlParser(website_url):
-    
-    url = urllib.request.urlopen(website_url)
-    html = url.read()
-    soup = BeautifulSoup(html)
-    for script in soup(["script","style"]):
-        script.extract()
-
-    text = soup.get_text()
-    lines = (line.strip() for line in text.splitlines())
-    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-    text = ''.join(chunk for chunk in chunks if chunk)
-    return text
-     
 
 def parse_html(url):
     req= requests.get(url)  #get the url request
@@ -32,5 +18,9 @@ def parse_html(url):
     h1_tag_content = None
     for h1_tag in soup.find_all("h1"):
         h1_tag_content = h1_tag.string
-    return title_content, meta_content, h1_tag_content;       
+    return title_content, meta_content, h1_tag_content;      
+
+if __name__ == '__main__':
+    print("This file can only be imported!")
+ 
     

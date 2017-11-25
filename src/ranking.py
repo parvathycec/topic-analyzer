@@ -84,7 +84,7 @@ def calculate_nof_token(word):
 
 def calculate_title_score(word, title_content):
     #title_content = soup.title.string
-    print("TITLE : ", title_content);
+    #print("TITLE : ", title_content);
     return calculate_rank(word,title_content,TITLE_SCORE)
 
     
@@ -178,7 +178,7 @@ def do_rank(url,rank_obj, content, title_content, meta_tag_content, h1_tag_conte
     
     no_of_token_score = 0
     no_of_token_score = calculate_nof_token(word)
-    print(no_of_token_score)
+    #print(no_of_token_score)
     
     if rank_obj.isPos == True:
         pos_score = POS_SCORE
@@ -192,42 +192,17 @@ def do_rank(url,rank_obj, content, title_content, meta_tag_content, h1_tag_conte
     
     total_rank = url_score + additional_meta_score + no_of_token_score +title_score + meta_score + h1_score + occurances_score + pos_score
     rank_obj.score = total_rank;
-    """ if((pos_score > 0) and (title_score > 0) and occurances_score > 10):
-        rank_obj.score = 10;
-    elif((pos_score > 0) and (title_score > 0)):
-        rank_obj.score = 9;
-    elif((pos_score == 0) and (title_score > 0)):
-        rank_obj.score = 9;
-    elif((pos_score > 0) and (h1_score > 0 or meta_score > 0)):
-        rank_obj.score = 9;
-    elif((pos_score > 0) and (additional_meta_score > 0)):
-        rank_obj.score = 8;
-    elif((pos_score > 0) and (occurances_score > 10)):
-        rank_obj.score = 7;
-    elif((pos_score > 0) and (no_of_token_score > 0)):
-        rank_obj.score = 6;
-    elif((pos_score == 0) and (h1_score > 0 or meta_score > 0)):
-        rank_obj.score = 5;
-    elif((pos_score == 0) and (additional_meta_score > 0)):
-        rank_obj.score = 4;
-    elif((pos_score > 0) and (occurances_score >10)):
-        rank_obj.score = 3;
-    elif((pos_score == 0) and (no_of_token_score > 0)):
-        rank_obj.score = 2;
-    elif((pos_score == 0) and (occurances_score >10)):
-        rank_obj.score = 1;"""
+
     #print("url_score,additional_meta_score,no_of_token_score,title_score,meta_score,h1_score,occurances_score,pos_score")
     #print(url_score,additional_meta_score,no_of_token_score,title_score,meta_score,h1_score,occurances_score,pos_score)
-    print(word, " : url : ", url_score, ", title : ", title_score, ", meta : ", meta_score, ", h1 : ", h1_score, ", occurence : ", occurances_score,
-          ", pos : ", pos_score, ", additional : ", additional_meta_score, " no_of_token_score : ", no_of_token_score);
-    print("Total ", total_rank);
+    #print(word, " : url : ", url_score, ", title : ", title_score, ", meta : ", meta_score, ", h1 : ", h1_score, ", occurence : ", occurances_score,
+     #     ", pos : ", pos_score, ", additional : ", additional_meta_score, " no_of_token_score : ", no_of_token_score);
+    #print("Total ", total_rank);
     
     #rank_obj.score = total_rank
 
     return rank_obj
 
+if __name__ == '__main__':
+    print("This file can only be imported!")
 
-#url = "https://www.nytimes.com/2017/11/16/nyregion/senator-robert-menendez-corruption.html"#
-#rank_obj = RankedWord.RankedWord("menendez corruption",True)
-#do_rank(url,rank_obj)
-#print(rank_obj.score)

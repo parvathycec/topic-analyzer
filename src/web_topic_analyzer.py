@@ -77,4 +77,6 @@ class WebTopicAnalyzer:
             print("ERROR: Some error occurred.");
             print(e);
             return {"error": "Sorry, something went wrong! Please verify the URL."};
-        
+
+if __name__ == '__main__':
+    print("This file can only be imported!")

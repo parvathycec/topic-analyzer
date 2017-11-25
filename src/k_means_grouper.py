@@ -2,6 +2,9 @@
 @summary: To remove keywords that are similar.
 This is to bring more diversity to the top ranked keywords.
 We use an algorithm called K-means for grouping.
+This algorithm is implemented and have not used third party library 
+(kmeans library is available) other than numpy (for computation)
+ and gensim (loading of data set)
 Each word in the keyword list is converted to a vector using word2vec.
 We use GoogleNews pre-trained dataset to get vector of word.
 Then, we divide the n keywords into k clusters.
@@ -157,3 +160,5 @@ def get_centroid(centroid_list, X):
     return get_centroid(centroid_list, X);
         
         
+if __name__ == '__main__':
+    print("This file can only be imported!")

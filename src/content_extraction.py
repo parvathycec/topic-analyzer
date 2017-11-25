@@ -19,3 +19,7 @@ def get_text(url):
         article.nlp();
         #Returns title and content of the website
         return (article.title, article.text);
+
+if __name__ == '__main__':
+    print("This file can only be imported!")
+    

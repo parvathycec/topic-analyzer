@@ -16,3 +16,8 @@ class RankedWord:
 
     def __str__(self):
         return str('Word : ' + str(self.word) + " Rank : " + str(self.score))
+    
+
+if __name__ == '__main__':
+    print("This file can only be imported!")
+
