@@ -95,7 +95,7 @@ class project_GUI:
                  label = tkinter.Label(self.frame_output_set_3,height = 3, justify = "center",anchor = "center",pady = 2, font = ("Calibri",12), fg = "brown",wraplength = 100, relief = "ridge",width = 20, padx = 1)
              self.labels.append(label)
 
-
+ 
     def check_url(self,url):
         try:
             request = requests.get(url)
@@ -127,10 +127,11 @@ class project_GUI:
     def on_extract(self):
         #pack the label
         #please_wait_label.pack_forget()
+        
         actual_url = self.current_url.get()
-                
+        
         if self.check_url(actual_url) == True:
-           
+           self.reset_button.config(state = "disabled")
            a = datetime.datetime.now()
            analyzer = WebTopicAnalyzer(actual_url);
            process_result = analyzer.process();
@@ -153,7 +154,7 @@ class project_GUI:
                     self.labels[label_index].pack(fill= "x",side = "left")
 
             #self.loading_text.pack_forget()
-        
+            self.reset_button.config(state = "normal")
             b = datetime.datetime.now()
             c = b - a
             print("Total time taken : ", c.seconds, " seconds")
