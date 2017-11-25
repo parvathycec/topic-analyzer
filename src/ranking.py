@@ -57,21 +57,21 @@ def calculate_rank(key,content,total_rank):
         else:
             return 0
 
-     
-
         
 def calculate_url_score(url,word):
-    #checks whether the word/phrase appears in the url,if it appears, then calculate a score accordingly
-    first_split = url.split("/")
-    second_split = first_split[ len(first_split)- 1]
+    
+    '''checks whether the word/phrase appears in the url,if it appears, then calculate a score accordingly'''
+    first_split = url.split("/") #split the url to get content accordingly
+    second_split = first_split[ len(first_split)- 1] 
     url_content = second_split.split(".")
     url_content = str(url_content[0])
-    url_content = url_content.replace("-"," ")
+    url_content = url_content.replace("-"," ") #url text is always appended with - instead of for space
     url_rank = calculate_rank(word,url_content,URL_SCORE)
     return url_rank
 
 
 def calculate_nof_token(word):
+    ''' if the given word is a phrase, give its additional score'''
     if " " in word: #if it is a phrase give additional rank score
         nof_token_score = NO_OF_TOKENS
 
@@ -83,17 +83,12 @@ def calculate_nof_token(word):
    
 
 def calculate_title_score(word, title_content):
-    #title_content = soup.title.string
-    #print("TITLE : ", title_content);
+    '''This function checks the title of the webpage and assigns the score to the word'''
     return calculate_rank(word,title_content,TITLE_SCORE)
 
     
 def calculate_meta_score(word, meta_content):
-    #meta_content = ""
-    #for meta_tag in soup.findAll("meta"):
-    #   meta_con =  meta_tag.get("content",None)
-    #   if meta_con != None:
-    #       meta_content += meta_con + " "
+    '''This function checks whether the word is in the meta information of the webpage and returns the score accordingly'''
     #check whether the word occurs in the meta data and assign rank
     if meta_content != "":
         return calculate_rank(word,meta_content,META_SCORE)
@@ -102,10 +97,7 @@ def calculate_meta_score(word, meta_content):
         return 0
 
 def calculate_h1_score(word, h1_tag_content):
-    #h1_tag_content = None
-    #for h1_tag in soup.find_all("h1"):
-    #    h1_tag_content = h1_tag.string
-    #if the word appears in the h1, then assign rank accordingly
+    '''if the word appears in the h1, then assign rank accordingly'''
     if h1_tag_content != None:
         h1_tag_rank = calculate_rank(word,h1_tag_content,H1_SCORE)
     else:
