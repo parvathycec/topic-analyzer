@@ -1,4 +1,11 @@
+'''
+Summary:
+This is class which is mainly to hold the word and its score.
+This is used as a helper for the ranking algorithm
 
+Author:
+Saranya Balaji
+'''
 class RankedWord:
     '''This class has 4 attributes, '''
     
