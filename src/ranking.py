@@ -25,7 +25,7 @@ def check_for_consecutive_numbers(List):
         return False
 
 def calculate_rank(key,content,total_rank):
-'''helper function which used to find whether the given word is in the given content or not; Accordinly it assigns a rsnk to the given word '''
+    '''helper function which used to find whether the given word is in the given content or not; Accordinly it assigns a rsnk to the given word '''
     rank =0
     content = content.split(" ") #the given content is split 
     content = [x.lower() for x in content] #convert all the words into lower case
@@ -106,17 +106,6 @@ def calculate_h1_score(word, h1_tag_content):
     return h1_tag_rank
         
 def calculate_occurances_score(word,article_content):
-    #article = Article(url)
-    #try:
-    #    article.download()
-    #except ArticleException:
-    #    print("Check your URL or network connection");
-    #    return None;
-    #else:
-    #    article.parse();
-        #article.nlp();
-    #    article_content = article.title
-
         
     if " " in word: #if there is a space in between the word, then it is considered as a phrase
         score = article_content.lower().count(word)

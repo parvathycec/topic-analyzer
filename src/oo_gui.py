@@ -34,6 +34,7 @@ class project_GUI:
         self.frame_output_set_1 = tkinter.Frame(self.master,height = 200,width = 1000)
         self.frame_output_set_2 = tkinter.Frame(self.master,height = 200,width = 1000)
         self.frame_output_set_3 = tkinter.Frame(self.master,height = 200,width = 1000)
+        self.frame_warning = tkinter.Frame(self.master,height = 50,width = 1000)
 
         #packing all the frames
         
@@ -45,6 +46,7 @@ class project_GUI:
         self.frame_output_set_1.pack()
         self.frame_output_set_2.pack()
         self.frame_output_set_3.pack()
+        self.frame_warning.pack()
         
         #variable to store the url which the user gives
         self.current_url= tkinter.StringVar()
@@ -68,7 +70,11 @@ class project_GUI:
 
         self.enter_url_label.pack(side= "left")
 
-        #entry for user to enter the url
+        #label to be displayed when too little tokens are expected
+
+        self.warning_message_label = tkinter.Label(self.frame_output_set_3,text = "Warning: Too small text data input, fewer or unpredictable keywords expected",height = 2,anchor = "center",fg="brown",font = ("calibri",15))
+
+        #entry widget for user to enter the url
 
 
         self.enter_user_url_label = tkinter.Entry(self.frame_url,width=100,textvariable = self.current_url)
@@ -122,6 +128,7 @@ class project_GUI:
         self.enter_user_url_label.delete(0,'end') #delete the content of the Entry widget
         self.label_op1.pack_forget() #remove the label
         self.progress_bar.pack_forget() #remove the progress bar
+        self.warning_message_label.pack_forget() #remove warning label
         for label in self.labels: #remove all the token labels
             label.pack_forget()
 
@@ -144,7 +151,8 @@ class project_GUI:
            a = datetime.datetime.now()
            analyzer = WebTopicAnalyzer(actual_url); #call the actual function
            process_result = analyzer.process(); #get the result in the process_result variable
-           
+         #  if 'is_input_small' in process_result:
+          #     self.warning_message_label.pack(side="bottom")
            if 'error' in process_result: #if error
             tkinter.messagebox.showerror("Error",process_result['error']); #show the error
            elif 'words' in process_result: #if no error
@@ -190,7 +198,7 @@ class project_GUI:
 
     
     def check_thread(self):
-    ''' to check whether the thread is still running, this is to make the gui app alive, even when the totoal execution takes more time'''
+        """to check whether the thread is still running, this is to make the gui app alive, even when the totoal execution takes more time """
         if foo_thread.is_alive():
             self.master.after(20, self.check_thread)
         else: #once the process is done, stop the progress bar and remove the progress bar
