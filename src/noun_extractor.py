@@ -10,12 +10,14 @@ If any of the search result is in article content, that phrase is
 taken as a potential keyword along with the noun.
 @author: Parvathy Mohan
 '''
+#Reference for Spacy implementation http://spacy.io/docs/usage/
 
 import copy
 from itertools import combinations
 from time import sleep
 import spacy
 import wikipedia
+
 
 from ranked_word import RankedWord
 from newspaper import article
@@ -39,10 +41,15 @@ def get_nouns(title, content):
             if wiki_phrase is not None:#If wiki result matches the content, add it as a candidate
                 wiki_phrase = wiki_phrase.rstrip().lstrip();
                 wiki_results[wiki_phrase] = RankedWord(wiki_phrase, noun.isPos);
+    #Reference: https://docs.python.org/3/library/copy.html
+    #Remove duplicates by removing repetition. Ex: one word is Washington and another word is Washington Post.
+    #Remove Washington, we need only Washington Post
     dict_nouns_copy = copy.deepcopy(dict_nouns)
     remove_duplicates(dict_nouns, dict_nouns_copy, True);
+    #Remove duplicates by comparing noun dictionary and wiki result dict
     remove_duplicates(dict_nouns, wiki_results);
     wiki_results_copy = copy.deepcopy(wiki_results)
+    #Remove duplicates by avoiding repetition in wiki_results
     remove_duplicates(wiki_results, wiki_results_copy, True);
     return list(dict_nouns.values())+list(wiki_results.values());
 
@@ -52,12 +59,13 @@ def extract_nouns(article_content):
     """Gets nouns in the article content using Spacy"""
     #load spacy for English
     doc = nlp(article_content)
-    compound_val = '';
+    compound_val = '';#For compound words, Ex: First token is Donald, and second token is Trump.
+    #It would be better to do a wiki search for "Donald Trump" than "Donald" and "Trump" separately 
     dict_nouns = {};
     for token in doc:
         #print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_,
         #  token.shape_, token.is_alpha, token.is_stop, token.ent_type_)
-        isCapitalToken = token.text.isupper();
+        isCapitalToken = token.text.isupper();#To show words like CNN as all case capital in UI.
         #recommendations and heuristics : Fine tuning candidates
         #Candidates are chosen with this algorithm:
         #1) If word is a proper noun and not too short word length 
@@ -65,22 +73,25 @@ def extract_nouns(article_content):
         #3)We don't need Date nouns.
         #4)We don't want proper nouns who don't have a definite entity type.
         token_val = token.text.rstrip().lstrip().lower();
-        if token.dep_ != 'compound' and (token.pos_ == 'PROPN' and len(token.text) > 2 and token.ent_type_ != "") or \
+        if (token.pos_ == 'PROPN' and len(token.text) > 2 and token.ent_type_ != "") or \
         (token.pos_ == 'NOUN' and token.tag_ != 'WP' and len(token.text) > 3 ):
             if(token.ent_type_ != 'DATE' and token.ent_type_ != 'TIME'):
                 wr = RankedWord(token_val, (token.pos_ == 'PROPN'), isUpper = isCapitalToken)
                 if (wr.getword() not in dict_nouns):
                     dict_nouns [wr.getword()] = wr;
             elif token_val in dict_nouns:
+                #Some tokens like a date could be considered Proper Noun in some context and noun in some content
+                #In those case, remove it
                 del dict_nouns[token_val];
         elif token_val in dict_nouns:
             del dict_nouns[token_val];#remove if it is not a noun in another context
         
-        #Searching for compound values to get more specific 
+        #Searching for compound values to get more specific results
         if (token.pos_ == 'NOUN' or token.pos_ == 'PROPN') and token.dep_ == 'compound':
-            compound_val += ' ' + token.text;
-        elif compound_val != '':
-            compound_val += ' ' + token.text; 
+            compound_val += ' ' + token.text;#First time compound word, save it
+        elif compound_val != '':#Earlier word was compound
+            if token.pos_ != "PART":
+                compound_val += " " + token.text; 
             compound_val = compound_val.lstrip().rstrip();
             rw = RankedWord(compound_val, (token.pos_ == 'PROPN'));
             wiki_phrase = search_wiki(rw, article_content, dict_nouns);
@@ -89,7 +100,7 @@ def extract_nouns(article_content):
                 dict_nouns[rw.getword()] = rw;
             compound_val = '';
         else:
-            compound_val = '';
+            compound_val = '';#clearing once compound done
     return dict_nouns;
 
 
@@ -114,12 +125,12 @@ def search_wiki(noun, article_content, dict_nouns):
             #this phrase is a potential candidate
             #https://en.wikipedia.org/wiki/Wikipedia:Article_titles#Deciding_on_an_article_title
             if len(topics) > 1  and contains(wiki_topic, article_content.lower()):
-                #if (wiki_topic == noun.getword()):#avoid duplicates
-                #    return None;
                 #Dont want cases like "The Case" where we get a result as "The <existing_noun_candidate"
                 if(len(topics) == 2 and topics[0] == "the"):
                     return None;
                 return wiki_topic;
+            #Heuristics, for places wiki standard is to add a comma, ex: San Jusan, Peuto Rico.
+            #If I need to search San Juan, we need to split by , and see
             elif (',' in wiki_topic) and any(t in article_content.lower() for t in wiki_topic.lower().split(",")):
                 phrases = wiki_topic.lower().split(",");
                 for phrase in phrases:
@@ -131,9 +142,7 @@ def search_wiki(noun, article_content, dict_nouns):
                                 count += 1;
                         if(count == len(phrase.split())):
                             return phrase;
-                    
-        
-                            
+                                            
 
 def remove_duplicates(dict_1, dict_2, isSame=False):
     """Remove occurrences in dict_1 for occurrence in dict_2"""
