@@ -1,6 +1,6 @@
 #this is the gui code for the project
 #learned the gui using the following link:
-#https://www.tutorialspoint.com/python/python_gui_programming.htm, the main reference for all the code which i used in this py is from the above link
+# reference : https://www.tutorialspoint.com/python/python_gui_programming.htm, the main reference for all the code which i used in this py is from the above link
 import tkinter
 from tkinter import messagebox
 import tkinter.ttk as ttk
@@ -92,6 +92,8 @@ class project_GUI:
         self.label_op1 = tkinter.Label(self.frame_output_heading)
         self.labels= []
         #creating 15 dynamic labels and storing their names in the list, so that all those can be accessed later
+        #three different label definitions mainly to have 5 labels in one row.
+        #the application will display max of 15 tokens, each 5 in each row
         for i in range(15):
              if i < 5:
                  label = tkinter.Label(self.frame_output_set_1, height = 3, justify = "center", anchor = "center",pady = 2,font = ("Calibri",12), fg= "brown",wraplength = 100, relief = "ridge",width = 20, padx = 1)
@@ -99,13 +101,14 @@ class project_GUI:
                  label = tkinter.Label(self.frame_output_set_2, height = 3 ,justify = "center",anchor = "center",pady = 2,font = ("Calibri",12), fg = "brown",wraplength = 100 ,relief = "ridge",width = 20, padx = 1)
              if i >= 10:
                  label = tkinter.Label(self.frame_output_set_3,height = 3, justify = "center",anchor = "center",pady = 2, font = ("Calibri",12), fg = "brown",wraplength = 100, relief = "ridge",width = 20, padx = 1)
-             self.labels.append(label)
+             self.labels.append(label) 
 
  
     def check_url(self,url):
+        ''' This function is to verify the user entered url'''
         try:
             request = requests.get(url)
-            if request.status_code == 200 and ("text/html" in request.headers["content-type"]):  
+            if request.status_code == 200 and ("text/html" in request.headers["content-type"]):  #if the status code is 200 and content type is text/html, then alone the corresponding url can be processed
                 return True
             else:
                 return False
@@ -113,43 +116,43 @@ class project_GUI:
         except:
             return False
 
-    #def pack_loading(self):
-    #    self.loading_text.config(text = "Loading...")
-    #    self.loading_text.pack()
-        
+   
     def on_reset(self):
-        self.enter_user_url_label.delete(0,'end')
-        self.label_op1.pack_forget()
-        self.progress_bar.pack_forget()
-        for label in self.labels:
+        ''' this function will be executed when the button reset is clicked'''
+        self.enter_user_url_label.delete(0,'end') #delete the content of the Entry widget
+        self.label_op1.pack_forget() #remove the label
+        self.progress_bar.pack_forget() #remove the progress bar
+        for label in self.labels: #remove all the token labels
             label.pack_forget()
 
 
     def no_url(self):
-        tkinter.messagebox.showerror("Error","Website does not exist or it is forbidden, Please check it!")
+        '''this function will be executed when the url entered by the user does not exist'''
+        tkinter.messagebox.showerror("Error","Website does not exist or it is forbidden, Please check it!") #show a error message box
 
        
         
     def on_extract(self):
+        ''' This function will be executed when the user clicks extract button'''
         #pack the label
         #please_wait_label.pack_forget()
         
-        actual_url = self.current_url.get()
+        actual_url = self.current_url.get() #get the user entered url to this variable
         
-        if self.check_url(actual_url) == True:
-           self.reset_button.config(state = "disabled")
+        if self.check_url(actual_url) == True:  #check is the url is valid
+           self.reset_button.config(state = "disabled") #disable the reset button, when the extraction process is going on
            a = datetime.datetime.now()
-           analyzer = WebTopicAnalyzer(actual_url);
-           process_result = analyzer.process();
+           analyzer = WebTopicAnalyzer(actual_url); #call the actual function
+           process_result = analyzer.process(); #get the result in the process_result variable
            
-           if 'error' in process_result:
-            tkinter.messagebox.showerror("Error",process_result['error']);
-           elif 'words' in process_result:
-            tokens = process_result['words'];
-            self.label_op1.config(text = "Tokens for the webpage", height = 3, anchor = "center", fg = "brown" , font = ("calibri",20))
+           if 'error' in process_result: #if error
+            tkinter.messagebox.showerror("Error",process_result['error']); #show the error
+           elif 'words' in process_result: #if no error
+            tokens = process_result['words']; #get the words to the tokens variable
+            self.label_op1.config(text = "Tokens for the webpage", height = 3, anchor = "center", fg = "brown" , font = ("calibri",20)) #label to show the heading 
             self.label_op1.pack(side = "top")
             
-            for label_index in range(len(tokens)):
+            for label_index in range(len(tokens)): #now set these returned tokens to the dynamic labels which we created before
                 if label_index < 5:
                     self.labels[label_index].config(text = str(tokens[label_index]))
                     self.labels[label_index].pack(fill= "x",side = "left")
@@ -161,7 +164,7 @@ class project_GUI:
                     self.labels[label_index].pack(fill= "x",side = "left")
 
             #self.loading_text.pack_forget()
-            self.reset_button.config(state = "normal")
+            self.reset_button.config(state = "normal") #here when the extraction is done , reset button will then be active again
             b = datetime.datetime.now()
             c = b - a
             print("Total time taken : ", c.seconds, " seconds")
@@ -169,9 +172,14 @@ class project_GUI:
           
             
         else:
-            self.no_url()
+            self.no_url()  #if url is not valid, call this function
+
+
+    #had an issue with the progress bar not showing up when needed and the gui app freezes even when the program is running fine, to solve this, we checked in google and made it as multi threading
+    #reference link : https://stackoverflow.com/questions/16400533/why-ttk-progressbar-appears-after-process-in-tkinter
             
     def start_thread(self, event):
+        ''' to start the multi threading'''
         global foo_thread
         foo_thread = threading.Thread(target=self.on_extract)
         foo_thread.daemon = True
@@ -179,18 +187,21 @@ class project_GUI:
         self.progress_bar.start()
         foo_thread.start()
         self.master.after(20, self.check_thread)
+
     
     def check_thread(self):
+    ''' to check whether the thread is still running, this is to make the gui app alive, even when the totoal execution takes more time'''
         if foo_thread.is_alive():
             self.master.after(20, self.check_thread)
-        else:
+        else: #once the process is done, stop the progress bar and remove the progress bar
+            
             self.progress_bar.stop()
             self.progress_bar.pack_forget();
 
    
 
 master = tkinter.Tk()
-master.state('zoomed')
+master.state('zoomed') #this one is to make the app geometry to the screen size
 p = project_GUI(master)
 
 master.mainloop()
