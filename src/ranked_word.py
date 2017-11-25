@@ -7,7 +7,7 @@ Author:
 Saranya Balaji
 '''
 class RankedWord:
-    '''This class has 4 attributes, '''
+    
     
     def __init__(self,word,isPos,score=0, isUpper=False):
         self.score = score #holds the score/rank for the current word
