@@ -1,4 +1,10 @@
-'''This py is to implement the ranking algorithm '''
+'''
+Summary: This program implements the ranking algorithm.
+It calculates and assigns the rank for the selected words.
+
+Author: Saranya Balaji
+'''
+
 import ranked_word  #import the class file
 
 #score values
