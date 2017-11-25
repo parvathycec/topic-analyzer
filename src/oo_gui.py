@@ -52,8 +52,9 @@ class project_GUI:
 
         #label for loading message
 
-        self.loading_text = tkinter.Label(self.frame_progress_bar, bd = 4, font = "Calibri", fg = "brown" , anchor = "center", height = 2)
-        
+        #self.loading_text = tkinter.Label(self.frame_progress_bar, bd = 4, font = "Calibri", fg = "brown" , anchor = "center", height = 2)
+        self.progress_bar = ttk.Progressbar(self.frame_progress_bar, orient='horizontal', length="300", mode='indeterminate')
+        #self.progress_bar.pack(expand=True, fill=tkinter.BOTH, side=tkinter.TOP)
         
         #label for user text
 
@@ -78,7 +79,7 @@ class project_GUI:
         self.reset_button.pack(side = "left")
 
         #extract button
-        self.extract_button = tkinter.Button(self.frame_buttons,text = "Extract",width=10,command = self.on_extract)
+        self.extract_button = tkinter.Button(self.frame_buttons,text = "Extract",width=10,command=lambda:self.start_thread(None))
         self.extract_button.pack(side = "left")
 
         self.label_op1 = tkinter.Label(self.frame_output_heading)
@@ -106,9 +107,9 @@ class project_GUI:
         except:
             return False
 
-    def pack_loading(self):
-        self.loading_text.config(text = "Loading...")
-        self.loading_text.pack()
+    #def pack_loading(self):
+    #    self.loading_text.config(text = "Loading...")
+    #    self.loading_text.pack()
         
     def on_reset(self):
         self.enter_user_url_label.delete(0,'end')
@@ -150,7 +151,7 @@ class project_GUI:
                     self.labels[label_index].config(text = str(tokens[label_index]))
                     self.labels[label_index].pack(fill= "x",side = "left")
 
-            self.loading_text.pack_forget()
+            #self.loading_text.pack_forget()
         
             b = datetime.datetime.now()
             c = b - a
@@ -161,7 +162,22 @@ class project_GUI:
         else:
             self.no_url()
             
-            
+    def start_thread(self, event):
+        global foo_thread
+        foo_thread = threading.Thread(target=self.on_extract)
+        foo_thread.daemon = True
+        self.progress_bar.pack(expand=True, fill=tkinter.BOTH, side=tkinter.TOP)
+        self.progress_bar.start()
+        foo_thread.start()
+        self.master.after(20, self.check_thread)
+    
+    def check_thread(self):
+        if foo_thread.is_alive():
+            self.master.after(20, self.check_thread)
+        else:
+            self.progress_bar.stop()
+            self.progress_bar.pack_forget();
+
    
 
 master = tkinter.Tk()
