@@ -134,8 +134,8 @@ def calculate_occurances_score(word,article_content):
     
 def do_rank(url,rank_obj, content, title_content, meta_tag_content, h1_tag_content):
 
-   ''' the main function which does the actual ranking'''
-   # rank_obj = RankedWord.RankedWord(word,isPos,score)
+    ''' the main function which does the actual ranking'''
+    # rank_obj = RankedWord.RankedWord(word,isPos,score)
 
     word = rank_obj.getword() #get the word 
 
