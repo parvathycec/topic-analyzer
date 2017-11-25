@@ -25,7 +25,7 @@ class project_GUI:
         self.frame_url = tkinter.Frame(self.master,height = 50,width = 1000)
         self.frame_buttons = tkinter.Frame(self.master,height = 50,width = 1000)
         self.frame_progress_bar = tkinter.Frame(self.master,height = 50, width = 1000)
-        self.frame_output_heading = tkinter.Frame(self.master,height = 200,width = 1000)
+        self.frame_output_heading = tkinter.Frame(self.master,height = 100,width = 1000)
         self.frame_output_set_1 = tkinter.Frame(self.master,height = 200,width = 1000)
         self.frame_output_set_2 = tkinter.Frame(self.master,height = 200,width = 1000)
         self.frame_output_set_3 = tkinter.Frame(self.master,height = 200,width = 1000)
@@ -35,8 +35,8 @@ class project_GUI:
         self.frame_header.pack()
         self.frame_url.pack()
         self.frame_buttons.pack()
-        self.frame_progress_bar.pack()
         self.frame_output_heading.pack()
+        self.frame_progress_bar.pack()
         self.frame_output_set_1.pack()
         self.frame_output_set_2.pack()
         self.frame_output_set_3.pack()
@@ -53,7 +53,7 @@ class project_GUI:
         #label for loading message
 
         #self.loading_text = tkinter.Label(self.frame_progress_bar, bd = 4, font = "Calibri", fg = "brown" , anchor = "center", height = 2)
-        self.progress_bar = ttk.Progressbar(self.frame_progress_bar, orient='horizontal', length="300", mode='indeterminate')
+        self.progress_bar = ttk.Progressbar(self.frame_progress_bar, orient='horizontal', length="400", mode='determinate')
         #self.progress_bar.pack(expand=True, fill=tkinter.BOTH, side=tkinter.TOP)
         
         #label for user text
