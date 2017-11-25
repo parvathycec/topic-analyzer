@@ -1,3 +1,6 @@
+#this is the gui code for the project
+#learned the gui using the following link:
+#https://www.tutorialspoint.com/python/python_gui_programming.htm, the main reference for all the code which i used in this py is from the above link
 import tkinter
 from tkinter import messagebox
 import tkinter.ttk as ttk
@@ -16,9 +19,11 @@ tokens = []
 class project_GUI:
     def __init__(self,master):
         self.master = master
+        #giving the title for the gui 
         self.master.title("Web Page Token Analyzer")
         #self.master.geometry("2000x2000+0+0")
 
+        #declaring all the frames needed for the application
         #frames
 
         self.frame_header = tkinter.Frame(self.master,height = 50,width = 1000)
@@ -41,16 +46,16 @@ class project_GUI:
         self.frame_output_set_2.pack()
         self.frame_output_set_3.pack()
         
-
+        #variable to store the url which the user gives
         self.current_url= tkinter.StringVar()
 
-        #label for header text title
-
+        #label for header text title, ie for the heading which comes up in the app 
+        
         self.title_label = tkinter.Label(self.frame_header, text = "Web Page Token Analyzer", anchor = "center", fg = "brown", height = 2)
         self.title_label.config(font = ("Calibri", 40))
         self.title_label.pack()
 
-        #label for loading message
+        #progress bar to show the progress of the program execution
 
         #self.loading_text = tkinter.Label(self.frame_progress_bar, bd = 4, font = "Calibri", fg = "brown" , anchor = "center", height = 2)
         self.progress_bar = ttk.Progressbar(self.frame_progress_bar, orient='horizontal', length="400", mode='determinate')
@@ -69,6 +74,7 @@ class project_GUI:
         self.enter_user_url_label = tkinter.Entry(self.frame_url,width=100,textvariable = self.current_url)
 
         self.enter_user_url_label.pack(side= "left")
+        #this one is to place the cursor in the Entry widget when the app loads. 
         self.enter_user_url_label.focus()
         
 
@@ -82,11 +88,11 @@ class project_GUI:
         self.extract_button = tkinter.Button(self.frame_buttons,text = "Extract",width=10,command=lambda:self.start_thread(None))
         self.extract_button.pack(side = "left")
 
+        #label to hold the heading when the output keywords are getting displayed
         self.label_op1 = tkinter.Label(self.frame_output_heading)
         self.labels= []
-
+        #creating 15 dynamic labels and storing their names in the list, so that all those can be accessed later
         for i in range(15):
-             label_text = "Label_" + str(i)
              if i < 5:
                  label = tkinter.Label(self.frame_output_set_1, height = 3, justify = "center", anchor = "center",pady = 2,font = ("Calibri",12), fg= "brown",wraplength = 100, relief = "ridge",width = 20, padx = 1)
              if i >=5 and i < 10:
@@ -135,6 +141,7 @@ class project_GUI:
            a = datetime.datetime.now()
            analyzer = WebTopicAnalyzer(actual_url);
            process_result = analyzer.process();
+           
            if 'error' in process_result:
             tkinter.messagebox.showerror("Error",process_result['error']);
            elif 'words' in process_result:
