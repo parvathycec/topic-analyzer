@@ -1,17 +1,21 @@
+'''This py is to implement the ranking algorithm '''
 import ranked_word  #import the class file
 
-URL_SCORE = 100
-TITLE_SCORE = 100
-H1_SCORE = 100
-META_SCORE = 100
-OCCURENCE_SCORE = 5
-POS_SCORE = 100
-NO_OF_TOKENS =100
+#score values
+URL_SCORE = 100 #if the word/phrase is found in the URL of the webpage
+TITLE_SCORE = 100 #if the word/phrase is found in the title of the webpage
+H1_SCORE = 100#if the word/phrase is found in the h1 tag of the webpage
+META_SCORE = 100 #if it is found in the meta tag of the webpage
+OCCURENCE_SCORE = 5# total number of occurences
+POS_SCORE = 100 # if it is phrase
+NO_OF_TOKENS =100 #total number of words
 
 
 
 
 def check_for_consecutive_numbers(List):
+    ''' helper function to check if the numbers in the list are consecutive or not'''
+    ''' used the formula, if the numbers are consecutive: then len(list ) == max - min + 1 and no duplicates'''
     if len(List) == (max(List) - min(List) + 1):
         if len(List) == len(set(List)):
             return True
@@ -21,43 +25,39 @@ def check_for_consecutive_numbers(List):
         return False
 
 def calculate_rank(key,content,total_rank):
-
+'''helper function which used to find whether the given word is in the given content or not; Accordinly it assigns a rsnk to the given word '''
     rank =0
-    content = content.split(" ")
-    content = [x.lower() for x in content]
-    content = [x.replace(",","") for x in content]
+    content = content.split(" ") #the given content is split 
+    content = [x.lower() for x in content] #convert all the words into lower case
+    content = [x.replace(",","") for x in content] # remove the , and .
     content = [x.replace(".","") for x in content]
     
     indices = []
-    if " " in key: #if it is a phrase
-        phrases = key.split(" ")
-        for p in phrases:
-            if p.lower() in content:
-                indices.append(content.index(p.lower()))
+    if " " in key: #if it is a phrase 
+        phrases = key.split(" ") #split the phrase
+        for p in phrases:  #for all the words in the phrase, convert to lower and get its index
+            if p.lower() in content: #check whether the lower case word of the phrase is in the content
+                indices.append(content.index(p.lower())) #if it is there, append its index
 
             
-            else:
+            else: #if any one of the word in the phrase is not in the content, then rank == 0
                 return 0
         #check if it is a consecutive number
         # two conditions to be checked, n(len of the list) == max(list) - min(list) + 1 and no duplicates
-
-        if (check_for_consecutive_numbers(indices) == True):
+        #this is mainly to avoid the following kind of cases: the given phrase : dual challenges, but in the content we have: induvidual challenges. 
+        if (check_for_consecutive_numbers(indices) == True): #the indices returned should be consecutive
             return total_rank
         else:
             return 0
         
        
     else: #if it is not a phrase
-        if key in content: 
+        if key in content:  
             return total_rank
         else:
             return 0
 
      
-
-        
-        
-                
 
         
 def calculate_url_score(url,word):
