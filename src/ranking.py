@@ -106,17 +106,17 @@ def calculate_h1_score(word, h1_tag_content):
     return h1_tag_rank
         
 def calculate_occurances_score(word,article_content):
-        
+    '''This function calculates the score/rank of the word/phrase based on its occurence in the webpage'''
     if " " in word: #if there is a space in between the word, then it is considered as a phrase
         score = article_content.lower().count(word)
         
         
         #score = check_all_cases_rank(word,article_content,OCCURENCE_SCORE)
 
-    else:
+    else:  #find for all the cases
 
         article_content_words = article_content.lower().split(" ")
-        article_content_words
+#        article_content_words
 
         score_1 = article_content_words.count(word)
         score_2 = article_content_words.count(word.lower())
@@ -133,9 +133,11 @@ def calculate_occurances_score(word,article_content):
     
     
 def do_rank(url,rank_obj, content, title_content, meta_tag_content, h1_tag_content):
+
+   ''' the main function which does the actual ranking'''
    # rank_obj = RankedWord.RankedWord(word,isPos,score)
 
-    word = rank_obj.getword()
+    word = rank_obj.getword() #get the word 
 
     #req= requests.get(url)  #get the url request
     #soup = BeautifulSoup(req.text,"lxml") #parse it through BeautifulSoup
@@ -147,40 +149,33 @@ def do_rank(url,rank_obj, content, title_content, meta_tag_content, h1_tag_conte
     occurances_score = 0
     pos_score = 0
     
-    url_score = calculate_url_score(url,word)
+    url_score = calculate_url_score(url,word) #get the url score by calling its helper function
 
-    title_score = calculate_title_score(word, title_content)
+    title_score = calculate_title_score(word, title_content) #get the title score by calling its helper function
     
-    meta_score =  calculate_meta_score(word, meta_tag_content)
+    meta_score =  calculate_meta_score(word, meta_tag_content) #get the meta score by calling its helper function
 
-    h1_score = calculate_h1_score(word, h1_tag_content)
+    h1_score = calculate_h1_score(word, h1_tag_content) #get the h1 score by calling its helper function
 
-    occurances_score = calculate_occurances_score(word,content)
+    occurances_score = calculate_occurances_score(word,content) #get the occurences score by calling its helper function
     
     no_of_token_score = 0
     no_of_token_score = calculate_nof_token(word)
     #print(no_of_token_score)
     
-    if rank_obj.isPos == True:
+    if rank_obj.isPos == True: #if isPos is true, that is, if it is a phrase, give more score to it
         pos_score = POS_SCORE
 
     additional_meta_score = 0
 
-    if pos_score != 0 and title_score != 0:
+    if pos_score != 0 and title_score != 0:  #if it is a phrase and the phrase is in the title too, then give additional score
         additional_meta_score = 50
     #total rank
     
     
-    total_rank = url_score + additional_meta_score + no_of_token_score +title_score + meta_score + h1_score + occurances_score + pos_score
-    rank_obj.score = total_rank;
+    total_rank = url_score + additional_meta_score + no_of_token_score +title_score + meta_score + h1_score + occurances_score + pos_score #total score/rank
+    rank_obj.score = total_rank; #set the objects attribute with the score
 
-    #print("url_score,additional_meta_score,no_of_token_score,title_score,meta_score,h1_score,occurances_score,pos_score")
-    #print(url_score,additional_meta_score,no_of_token_score,title_score,meta_score,h1_score,occurances_score,pos_score)
-    #print(word, " : url : ", url_score, ", title : ", title_score, ", meta : ", meta_score, ", h1 : ", h1_score, ", occurence : ", occurances_score,
-     #     ", pos : ", pos_score, ", additional : ", additional_meta_score, " no_of_token_score : ", no_of_token_score);
-    #print("Total ", total_rank);
-    
-    #rank_obj.score = total_rank
 
     return rank_obj
 
