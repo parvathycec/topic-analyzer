@@ -24,62 +24,27 @@ from newspaper import article
 nlp = spacy.load('en');
 
 def get_nouns(title, content):
-    """Get all noun chunks from the text extracted from website
-    and get related word phrases from wikipedia search"""
+    """Get all noun chunks from the title and content text
+    and get word phrases using wikipedia search"""
     article_content = title + " " + content;
-    #print(article_content);
+    #Get words which are proper nouns and special case nouns
     dict_nouns = extract_nouns(article_content);
     #once we get noun candidates (individual words), we search wiki articles to 
     #see if there is any related word phrase results that is also 
     #present in our web-content
     wiki_results = {};
     for noun in dict_nouns.values():
-        #print("Noun Candidate : ", noun)
-        if noun.isPos:
-            #print("Going for wiki");
+        if noun.isPos:#Is Proper Noun? only then go for wiki search.
             wiki_phrase = search_wiki(noun, article_content, dict_nouns);
-            if wiki_phrase is not None:
-                wiki_results[wiki_phrase.rstrip().lstrip()] = RankedWord(wiki_phrase.rstrip().lstrip(), noun.isPos);
-    title_nouns, wiki_titles = extract_title_nouns(title, article_content);
-    #To merge two dictionaries
-    #Reference: https://stackoverflow.com/questions/38987/how-to-merge-two-dictionaries-in-a-single-expression
-    #Reference: https://stackoverflow.com/questions/23177439/python-checking-if-a-dictionary-is-empty-doesnt-seem-to-work
-    if(not bool(title_nouns)):
-        dict_nouns.update(title_nouns);
-    if(not bool(wiki_titles)):
-        wiki_results.update(wiki_titles);
-    #Removing nouns already in wiki:
+            if wiki_phrase is not None:#If wiki result matches the content, add it as a candidate
+                wiki_phrase = wiki_phrase.rstrip().lstrip();
+                wiki_results[wiki_phrase] = RankedWord(wiki_phrase, noun.isPos);
+    dict_nouns_copy = copy.deepcopy(dict_nouns)
+    remove_duplicates(dict_nouns, dict_nouns_copy, True);
     remove_duplicates(dict_nouns, wiki_results);
     wiki_results_copy = copy.deepcopy(wiki_results)
     remove_duplicates(wiki_results, wiki_results_copy, True);
-    
     return list(dict_nouns.values())+list(wiki_results.values());
-
-
-def extract_title_nouns(title, content):
-    """Extract nouns and pronouns from title"""
-    noun_chunks = {};
-    doc_title = nlp(title.replace("'", ' '));
-    dict_nouns = {};
-    for token in doc_title:
-        isCapitalToken = token.text.isupper();
-        if (token.pos_ == 'PROPN' and len(token.text) > 2 and token.ent_type_ != "") or \
-            (token.pos_ == 'NOUN' and token.tag_ != 'WP' and len(token.text) > 3 and token.ent_type_ != ""):
-                if(token.ent_type_ != 'DATE' and token.ent_type_ != 'TIME'):
-                    wr = RankedWord(token.text.rstrip().lstrip().lower(), (token.pos_ == 'PROPN'), isUpper = isCapitalToken)
-                    if (wr.getword() not in dict_nouns):
-                        dict_nouns [wr.getword()] = wr;
-                elif token.text.rstrip().lstrip().lower() in dict_nouns:
-                    del dict_nouns[token.text.rstrip().lstrip().lower()];
-        elif token.text.rstrip().lstrip().lower() in dict_nouns:
-            del dict_nouns[token.text.rstrip().lstrip().lower()];#remove if it is not a noun in another context
-    wiki_results = {};  
-    for noun in dict_nouns.values():
-        #print("Going for wiki");
-        wiki_phrase = search_wiki(noun, title+ " "+content, dict_nouns);
-        if wiki_phrase is not None:
-            wiki_results[wiki_phrase.rstrip().lstrip()] = RankedWord(wiki_phrase.rstrip().lstrip(), noun.isPos);
-    return dict_nouns, wiki_results;
 
 
 
@@ -87,27 +52,44 @@ def extract_nouns(article_content):
     """Gets nouns in the article content using Spacy"""
     #load spacy for English
     doc = nlp(article_content)
+    compound_val = '';
     dict_nouns = {};
     for token in doc:
         #print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_,
         #  token.shape_, token.is_alpha, token.is_stop, token.ent_type_)
         isCapitalToken = token.text.isupper();
-        #heuristics : Fine tuning candidates
+        #recommendations and heuristics : Fine tuning candidates
         #Candidates are chosen with this algorithm:
         #1) If word is a proper noun and not too short word length 
         #2)If word is a noun that is not too short and not belonging to WH words like who, what, where.
         #3)We don't need Date nouns.
         #4)We don't want proper nouns who don't have a definite entity type.
-        if (token.pos_ == 'PROPN' and len(token.text) > 2 and token.ent_type_ != "") or \
+        token_val = token.text.rstrip().lstrip().lower();
+        if token.dep_ != 'compound' and (token.pos_ == 'PROPN' and len(token.text) > 2 and token.ent_type_ != "") or \
         (token.pos_ == 'NOUN' and token.tag_ != 'WP' and len(token.text) > 3 ):
             if(token.ent_type_ != 'DATE' and token.ent_type_ != 'TIME'):
-                wr = RankedWord(token.text.rstrip().lstrip().lower(), (token.pos_ == 'PROPN'), isUpper = isCapitalToken)
+                wr = RankedWord(token_val, (token.pos_ == 'PROPN'), isUpper = isCapitalToken)
                 if (wr.getword() not in dict_nouns):
                     dict_nouns [wr.getword()] = wr;
-            elif token.text.rstrip().lstrip().lower() in dict_nouns:
-                del dict_nouns[token.text.rstrip().lstrip().lower()];
-        elif token.text.rstrip().lstrip().lower() in dict_nouns:
-            del dict_nouns[token.text.rstrip().lstrip().lower()];#remove if it is not a noun in another context
+            elif token_val in dict_nouns:
+                del dict_nouns[token_val];
+        elif token_val in dict_nouns:
+            del dict_nouns[token_val];#remove if it is not a noun in another context
+        
+        #Searching for compound values to get more specific 
+        if (token.pos_ == 'NOUN' or token.pos_ == 'PROPN') and token.dep_ == 'compound':
+            compound_val += ' ' + token.text;
+        elif compound_val != '':
+            compound_val += ' ' + token.text; 
+            compound_val = compound_val.lstrip().rstrip();
+            rw = RankedWord(compound_val, (token.pos_ == 'PROPN'));
+            wiki_phrase = search_wiki(rw, article_content, dict_nouns);
+            if wiki_phrase is not None:
+                rw = RankedWord(wiki_phrase, (token.pos_ == 'PROPN'));
+                dict_nouns[rw.getword()] = rw;
+            compound_val = '';
+        else:
+            compound_val = '';
     return dict_nouns;
 
 
@@ -121,10 +103,8 @@ def search_wiki(noun, article_content, dict_nouns):
         print(e);
         return None;
     else:
-        #print("Wiki : ", wiki_result);
         for wiki_topic in wiki_result:
-            wiki_topic = wiki_topic.lower();
-            #print("wiki_topic ", wiki_topic);
+            wiki_topic = wiki_topic.lower().rstrip().lstrip();
             topics = wiki_topic.split();
             #for easier comparison, converting to lower case
             #We need only phrases here, don't need words as it would be duplicate
@@ -133,49 +113,58 @@ def search_wiki(noun, article_content, dict_nouns):
             #Wiki results will get the phrase Statue of Liberty and if it is in web page, 
             #this phrase is a potential candidate
             #https://en.wikipedia.org/wiki/Wikipedia:Article_titles#Deciding_on_an_article_title
-            if len(topics) > 1  and (" "+wiki_topic.lower() in article_content.lower() or " "+wiki_topic.lower()+" " in article_content.lower()):
-                if (wiki_topic == noun.getword()):#avoid duplicates
-                    return None;
+            if len(topics) > 1  and contains(wiki_topic, article_content.lower()):
+                #if (wiki_topic == noun.getword()):#avoid duplicates
+                #    return None;
                 #Dont want cases like "The Case" where we get a result as "The <existing_noun_candidate"
                 if(len(topics) == 2 and topics[0] == "the"):
                     return None;
-                return wiki_topic.lower().rstrip().lstrip();
+                return wiki_topic;
             elif (',' in wiki_topic) and any(t in article_content.lower() for t in wiki_topic.lower().split(",")):
                 phrases = wiki_topic.lower().split(",");
-                #print("Phrases : ", phrases);
                 for phrase in phrases:
-                    #print("phrase : ", phrase)
-                    if phrase.lstrip().rstrip() in article_content.lower():
-                        #print("IN")
+                    phrase = phrase.lstrip().rstrip();
+                    if phrase in article_content.lower():
                         count = 0;
                         for ph in phrase.split():
                             if ph in dict_nouns:# and dict_nouns[ph].isPos and (len(ph.split()) > 1):
                                 count += 1;
                         if(count == len(phrase.split())):
-                            #print("Returning : ", phrase)
-                            return phrase.lstrip().rstrip();
+                            return phrase;
                     
         
                             
 
-def remove_duplicates(dict_nouns, wiki_results, isSame=False):
-    """Remove duplicates"""
-    for wiki_val in wiki_results.keys():
-        arr = wiki_val.split();
-        for i in range(0,len(arr)):
-            wiki_val_arr = wiki_val.split()[i:len(arr)];
-            for i in range(1, len(wiki_val_arr)+1):
-                iter_k = combinations(wiki_val_arr, i)
+def remove_duplicates(dict_1, dict_2, isSame=False):
+    """Remove occurrences in dict_1 for occurrence in dict_2"""
+    #For values like 'The Washington Post" in dict_2,
+    #we will remove The, Washington and Post from dict_1 
+    for dict_2_val in dict_2.keys():#For each key in dict_2
+        arr = dict_2_val.split();
+        for i in range(0,len(arr)):#Starting point varies from 0 to len
+            dict_2_val_arr = dict_2_val.split()[i:len(arr)];
+            for i in range(1, len(dict_2_val_arr)+1):
+                #Get different combination of string in dict_2
+                iter_k = combinations(dict_2_val_arr, i)
                 curr_combination = ' '.join(iter_k.__next__());
-                #print('curr_combination ', curr_combination);
-                for nn in list(dict_nouns):
-                    #print('nn ', nn);
+                for nn in list(dict_1):#Checking if current combination is present in dict_1
                     if curr_combination.rstrip().lstrip() == nn.rstrip().lstrip():
-                        if isSame and (curr_combination.rstrip().lstrip() == wiki_val.rstrip().lstrip()):
+                        #If checking for duplicates against same dict, don't erase the value
+                        if isSame and (curr_combination.rstrip().lstrip() == dict_2_val.rstrip().lstrip()):
                             pass
                         else:
-                            #print("Deleting")
-                            del dict_nouns[nn.rstrip().lstrip()];
+                            #Delete from dict_1 if present in dict_2
+                            del dict_1[nn.rstrip().lstrip()];
+
+def contains(str1, str2):
+    """Check if str1 occurs in str2 in any format"""
+    begin_list = [" ", ".", ". ",", ", ",", "!", "! ", "'", "(", "/"];
+    end_list = [" ", ".", ". ",", ", ",", "!", "! ", "'", ")", "/"];
+    for begin_str in begin_list:#Different combination of string with special characters
+        #possible in text.  Ex:- searching 'Donald Trump' or Donald Trump,
+        for end_str in end_list:
+            if (begin_str+str1+end_str in str2):
+                return True;
                             
 if __name__ == '__main__':
     print("This file can only be imported!")
