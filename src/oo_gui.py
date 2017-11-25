@@ -88,11 +88,11 @@ class project_GUI:
         for i in range(15):
              label_text = "Label_" + str(i)
              if i < 5:
-                 label = tkinter.Label(self.frame_output_set_1, height = 3, justify = "center", anchor = "center",pady = 2,font = ("Calibri",14), fg= "brown",wraplength = 250, relief = "ridge",width = 30, padx = 1)
+                 label = tkinter.Label(self.frame_output_set_1, height = 3, justify = "center", anchor = "center",pady = 2,font = ("Calibri",12), fg= "brown",wraplength = 100, relief = "ridge",width = 20, padx = 1)
              if i >=5 and i < 10:
-                 label = tkinter.Label(self.frame_output_set_2, height = 3 ,justify = "center",anchor = "center",pady = 2,font = ("Calibri",14), fg = "brown",wraplength = 250 ,relief = "ridge",width = 30, padx = 1)
+                 label = tkinter.Label(self.frame_output_set_2, height = 3 ,justify = "center",anchor = "center",pady = 2,font = ("Calibri",12), fg = "brown",wraplength = 100 ,relief = "ridge",width = 20, padx = 1)
              if i >= 10:
-                 label = tkinter.Label(self.frame_output_set_3,height = 3, justify = "center",anchor = "center",pady = 2, font = ("Calibri",14), fg = "brown",wraplength = 250, relief = "ridge",width = 30, padx = 1)
+                 label = tkinter.Label(self.frame_output_set_3,height = 3, justify = "center",anchor = "center",pady = 2, font = ("Calibri",12), fg = "brown",wraplength = 100, relief = "ridge",width = 20, padx = 1)
              self.labels.append(label)
 
 
@@ -114,6 +114,7 @@ class project_GUI:
     def on_reset(self):
         self.enter_user_url_label.delete(0,'end')
         self.label_op1.pack_forget()
+        self.progress_bar.pack_forget()
         for label in self.labels:
             label.pack_forget()
 
