@@ -72,6 +72,9 @@ class WebTopicAnalyzer:
                 return {'words' : key_words, "is_input_small" : is_input_small};
             else:
                 return {'words' : key_words};
+        except ValueError as e:
+            print(e);
+            return {"error": e};
         except Exception as e:
             print("ERROR: Some error occurred.");
             print(e);

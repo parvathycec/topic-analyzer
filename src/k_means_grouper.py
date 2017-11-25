@@ -3,8 +3,7 @@
 This is to bring more diversity to the top ranked keywords.
 We use an algorithm called K-means for grouping.
 This algorithm is implemented and have not used third party library 
-(kmeans library is available) other than numpy (for computation)
- and gensim (loading of data set)
+other than numpy (for computation) and gensim (loading of data set)
 Each word in the keyword list is converted to a vector using word2vec.
 We use GoogleNews pre-trained dataset to get vector of word.
 Then, we divide the n keywords into k clusters.
@@ -33,8 +32,10 @@ def get_clusters(ranked_words):
         return ranked_words, [];
     #Reference https://stackoverflow.com/questions/42094180/spacy-how-to-load-google-news-word2vec-vectors
     #Loading pre-trained smaller dataset of GoogleNews
-    model = KeyedVectors.load('GoogleNews-vectors-gensim-normed.bin', mmap='r')
-    
+    try:
+        model = KeyedVectors.load('GoogleNews-vectors-gensim-normed.bin', mmap='r')
+    except:
+        raise ValueError("Please refer README for data set configuration!");
     #Word and vector mapping 
     word2vec_dict = {}#Key is the word and value is the vector
     #List of words which don't have a vector representation in data set
