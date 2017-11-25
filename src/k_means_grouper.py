@@ -3,8 +3,7 @@
 This is to bring more diversity to the top ranked keywords.
 We use an algorithm called K-means for grouping.
 This algorithm is implemented and have not used third party library 
-(kmeans library is available) other than numpy (for computation)
- and gensim (loading of data set)
+other than numpy (for computation) and gensim (loading of data set)
 Each word in the keyword list is converted to a vector using word2vec.
 We use GoogleNews pre-trained dataset to get vector of word.
 Then, we divide the n keywords into k clusters.
@@ -31,9 +30,12 @@ def get_clusters(ranked_words):
     if(len(ranked_words) < 15):
         #Cannot group too small data set, return as it is
         return ranked_words, [];
+    #Reference https://stackoverflow.com/questions/42094180/spacy-how-to-load-google-news-word2vec-vectors
     #Loading pre-trained smaller dataset of GoogleNews
-    model = KeyedVectors.load('GoogleNews-vectors-gensim-normed.bin', mmap='r')
-    
+    try:
+        model = KeyedVectors.load('GoogleNews-vectors-gensim-normed.bin', mmap='r')
+    except:
+        raise ValueError("Please refer README for data set configuration!");
     #Word and vector mapping 
     word2vec_dict = {}#Key is the word and value is the vector
     #List of words which don't have a vector representation in data set
@@ -49,6 +51,7 @@ def get_clusters(ranked_words):
         else:
             no_vector_words.append(rw);
     
+    #Reference: https://learn.scientificprogramming.io/python-k-means-data-clustering-and-finding-of-the-best-k-485f66297c06
     #pick K random points as cluster,
     #To computer best K, we try K as 1 to 10 and find the best K
     sum_distance_arr = [];
@@ -70,7 +73,6 @@ def get_clusters(ranked_words):
         #We are comparing the change between each sum and the minimum changed step is taken as K
         list_val = [abs(t - s) for s, t in zip(sum_distance_arr, sum_distance_arr[1:])];
         k = list_val.index(min(list_val))+1;
-    print("Value of k is ", k);
     #Now we got k, we have to get cluster based on it.
     centroid_list = random.sample(X, k);
     final_centroid_map = get_centroid(centroid_list, X);
@@ -82,11 +84,9 @@ def get_clusters(ranked_words):
         counter += 1;
         #Getting corresponding word from data set based on the vector.
         centroid_word, centroid_vector = model.most_similar(positive=[np.array(tuple(word_vec),dtype=dt)], topn=1)[0];
-        print("centroid : ", centroid_word)
         data_clusters = [];
         for val_vec in final_centroid_map[word_vec]:
             data_word, data_vector = model.most_similar(positive=[np.array(tuple(val_vec),dtype=dt)], topn=1)[0];
-            print("cluster : ", data_word)
             data_clusters.append(get_ranked_word(ranked_words, data_word));
         data_cluster_list.append(data_clusters);
     #Returning those keywords which did not have vectors

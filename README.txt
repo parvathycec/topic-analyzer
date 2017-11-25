@@ -3,13 +3,6 @@ Python 3.6
 In Windows: Microsoft C++ 15 build tools
 Link: http://landinghub.visualstudio.com/visual-cpp-build-tools
 
-Third Party Libraries to be installed (Commands below):
-1) BeautifulSoup
-2) Newspaper Article
-3) Numpy
-4) Spacy
-5) Gensim
-
 Commands to install libraries (tested in Windows 10):
 
 python -m pip install beautifulsoup4
@@ -31,3 +24,12 @@ https://github.com/parvathycec/topic-analyzer/blob/master/src/GoogleNews-vectors
 
 Run project:
 python project_ui.py
+
+Notes:
+Analyzer might take upto a few minutes to get the output based on the length of the article.
+This is because a lot of HTTP calls are occurring.
+We have tested mainly the articles in http://news.google.com
+Some of the test links we tested are:
+http://thehill.com/policy/cybersecurity/361583-4-legal-dimensions-of-the-uber-data-breach
+http://news.bbc.co.uk/2/hi/health/2284783.stm
+http://www.latimes.com/business/hiltzik/la-fi-hiltzik-net-neutrality-20171122-story.html 

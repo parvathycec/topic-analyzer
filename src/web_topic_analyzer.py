@@ -60,7 +60,6 @@ class WebTopicAnalyzer:
             #Will show first 15 ranked keywords
             for rw in final_ranked_words:
                 count += 1;
-                print(rw.getword(), " ", rw.getscore());
                 if len(key_words) == 15:
                     break;
                 else:
@@ -73,6 +72,9 @@ class WebTopicAnalyzer:
                 return {'words' : key_words, "is_input_small" : is_input_small};
             else:
                 return {'words' : key_words};
+        except ValueError as e:
+            print(e);
+            return {"error": e};
         except Exception as e:
             print("ERROR: Some error occurred.");
             print(e);
