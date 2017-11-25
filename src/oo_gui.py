@@ -72,7 +72,7 @@ class project_GUI:
 
         #label to be displayed when too little tokens are expected
 
-        self.warning_message_label = tkinter.Label(self.frame_output_set_3,text = "Warning: Too small text data input, fewer or unpredictable keywords expected",height = 2,anchor = "center",fg="brown",font = ("calibri",15))
+        self.warning_message_label = tkinter.Label(self.frame_warning,text = "Warning: Too small text data input, fewer or unpredictable keywords expected",height = 2,anchor = "center",fg="brown",font = ("calibri",15),justify = "center")
 
         #entry widget for user to enter the url
 
@@ -151,8 +151,8 @@ class project_GUI:
            a = datetime.datetime.now()
            analyzer = WebTopicAnalyzer(actual_url); #call the actual function
            process_result = analyzer.process(); #get the result in the process_result variable
-         #  if 'is_input_small' in process_result:
-          #     self.warning_message_label.pack(side="bottom")
+           if 'is_input_small' in process_result:
+               self.warning_message_label.pack(side="bottom")
            if 'error' in process_result: #if error
             tkinter.messagebox.showerror("Error",process_result['error']); #show the error
            elif 'words' in process_result: #if no error
