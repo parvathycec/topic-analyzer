@@ -33,8 +33,8 @@ class project_GUI:
         self.frame_output_heading = tkinter.Frame(self.master,height = 100,width = 1000)
         self.frame_output_set_1 = tkinter.Frame(self.master,height = 200,width = 1000)
         self.frame_output_set_2 = tkinter.Frame(self.master,height = 200,width = 1000)
-        self.frame_output_set_3 = tkinter.Frame(self.master,height = 200,width = 1000)
-        self.frame_warning = tkinter.Frame(self.master,height = 50,width = 1000)
+        self.frame_output_set_3 = tkinter.Frame(self.master,height = 20,width = 1000)
+        self.frame_warning = tkinter.Frame(self.master,height = 20,width = 1000)
 
         #packing all the frames
         
@@ -143,16 +143,23 @@ class project_GUI:
         ''' This function will be executed when the user clicks extract button'''
         #pack the label
         #please_wait_label.pack_forget()
-        
+         #call reset first
         actual_url = self.current_url.get() #get the user entered url to this variable
+        self.label_op1.pack_forget()
+        
+        self.warning_message_label.pack_forget()
+        for label in self.labels: #remove all the token labels
+            label.pack_forget()
         
         if self.check_url(actual_url) == True:  #check is the url is valid
+            
            self.reset_button.config(state = "disabled") #disable the reset button, when the extraction process is going on
+           self.extract_button.config(state = "disabled")
            a = datetime.datetime.now()
            analyzer = WebTopicAnalyzer(actual_url); #call the actual function
            process_result = analyzer.process(); #get the result in the process_result variable
            if 'is_input_small' in process_result:
-               self.warning_message_label.pack(side="bottom")
+               self.warning_message_label.pack(side="top")
            if 'error' in process_result: #if error
             tkinter.messagebox.showerror("Error",process_result['error']); #show the error
            elif 'words' in process_result: #if no error
@@ -173,6 +180,7 @@ class project_GUI:
 
             #self.loading_text.pack_forget()
             self.reset_button.config(state = "normal") #here when the extraction is done , reset button will then be active again
+            self.extract_button.config(state = "normal")
             b = datetime.datetime.now()
             c = b - a
             print("Total time taken : ", c.seconds, " seconds")
