@@ -16,11 +16,12 @@ python -m pip install numpy
 python -m pip install --upgrade gensim
 python -m nltk.downloader punkt
 
-DataSet to be downloaded:
+Data set configuration:
 
 Download from the github link below and put it in the same directory as python files.
 
 https://github.com/parvathycec/topic-analyzer/blob/master/src/GoogleNews-vectors-gensim-normed.bin
+This file should be in the same directory as python files and name should be GoogleNews-vectors-gensim-normed.bin
 
 Run project:
 python project_gui.py
