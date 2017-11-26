@@ -173,6 +173,8 @@ class project_GUI:
                self.warning_message_label.pack(side="top")
            if 'error' in process_result: #if error
             tkinter.messagebox.showerror("Error",process_result['error']); #show the error
+            self.reset_button.config(state = "normal") #after showing the error, enable the reset and extract buttons
+            self.extract_button.config(state = "normal")
            elif 'words' in process_result: #if no error
             tokens = process_result['words']; #get the words to the tokens variable
             self.label_op1.config(text = "Tokens for the webpage", height = 3, anchor = "center", fg = "brown" , font = ("calibri",20)) #label to show the heading 
