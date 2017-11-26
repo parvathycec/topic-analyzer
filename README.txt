@@ -23,7 +23,7 @@ Download from the github link below and put it in the same directory as python f
 https://github.com/parvathycec/topic-analyzer/blob/master/src/GoogleNews-vectors-gensim-normed.bin
 
 Run project:
-python project_ui.py
+python project_gui.py
 
 Notes:
 Analyzer might take upto a few minutes to get the output based on the length of the article.
