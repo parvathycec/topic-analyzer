@@ -16,6 +16,13 @@ python -m pip install numpy
 python -m pip install --upgrade gensim
 python -m nltk.downloader punkt
 
+Data set configuration:
+GoogleNews-vectors-gensim-normed.bin should be in same folder as python files for the application to run.
+It is zipped along with python files.
+Just ensure the file is present.
+If there is any issue, you can download from here:
+https://github.com/parvathycec/topic-analyzer/blob/master/src/GoogleNews-vectors-gensim-normed.bin
+
 Run project:
 python project_gui.py
 
